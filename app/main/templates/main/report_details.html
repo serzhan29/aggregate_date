@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/report_details.css' %}">
+</head>
+<body>
+    <h1>Индикатор: {{ indicator_name }}</h1>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% else %}
+        <h2>Суммарный план: </h2>
+        <p>План 2022-2023: {{ admin_report.total_plan_2022_2023 }}</p>
+        <p>План 2023-2024: {{ admin_report.total_actual_2023_2024 }}</p>
+        <p>План 2024-2025: {{ admin_report.total_plan_2024_2025 }}</p>
+
+        <h2>План учителей:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Teacher</th>
+                    <th>План 2022-2023</th>
+                    <th>План 2023-2024</th>
+                    <th>План 2024-2025</th>
+                    <!--
+                    <th>Общий план 2022-2023</th>
+                    <th>Admin Total Actual 2023-2024</th>
+                    <th>Admin Total Plan 2024-2025</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                    <tr>
+                        <td>{{ teacher.name }}</td>
+                        <td>{{ teacher.plan_2022_2023 }}</td>
+                        <td>{{ teacher.actual_2023_2024 }}</td>
+                        <td>{{ teacher.plan_2024_2025 }}</td>
+                        <!--
+                        <td>{{ teacher.admin_total_plan_2022_2023 }}</td>
+                        <td>{{ teacher.admin_total_actual_2023_2024 }}</td>
+                        <td>{{ teacher.admin_total_plan_2024_2025 }}</td> -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    <br>
+    <a href="javascript:history.back()" class="back-button">Назад</a>
+</body>
+</html>

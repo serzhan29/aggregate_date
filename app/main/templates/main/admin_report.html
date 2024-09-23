@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Агрегированные данные по индикаторам</title>
+    <link rel="stylesheet" href="{% static 'css/admin_report.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Индикатор</th>
+            <th>Суммарный план 2022-2023</th>
+            <th>Суммарные данные 2023-2024</th>
+            <th>Суммарный план 2024-2025</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in admin_reports %}
+            <tr>
+                <td>
+                    <a href="{% url 'report_details' report.indicator.id %}" class="btn btn-info btn-sm">
+                        {{ report.indicator.name }}
+                    </a>
+                </td>
+                <td>{{ report.total_plan_2022_2023 }}</td>
+                <td>{{ report.total_actual_2023_2024 }}</td>
+                <td>{{ report.total_plan_2024_2025 }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'update_admin_reports' %}" class="btn btn-primary">Обновить данные</a>
+
+<!-- Форма выхода -->
+<form action="{% url 'logout' %}" method="POST" style="margin-top: 10px;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Выход</button>
+</form>
+
+</body>
+</html>

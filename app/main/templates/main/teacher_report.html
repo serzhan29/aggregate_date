@@ -1,0 +1,45 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/teacher_report.css' %}">
+
+<h1>Отчет учителя {{ user.last_name }}  {{ user.first_name }}</h1>
+<form method="POST">
+    {% csrf_token %}
+    <table>
+        <thead>
+            <tr>
+                <th>Индикатор</th>
+                <th>План 2022-2023</th>
+                <th>Фактически 2023-2024</th>
+                <th>План 2024-2025</th>
+                <th>Комментарий</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for indicator in indicators %}
+                <tr>
+                    <td>{{ indicator.name }}</td>
+                    {% with report=reports_list|dictsort:"indicator.id"|first %}
+                        {% if report and report.indicator.id == indicator.id %}
+                            <td><input type="number" name="plan_2022_2023_{{ indicator.id }}" value="{{ report.plan_2022_2023|default:0 }}" /></td>
+                            <td><input type="number" name="actual_2023_2024_{{ indicator.id }}" value="{{ report.actual_2023_2024|default:0 }}" /></td>
+                            <td><input type="number" name="plan_2024_2025_{{ indicator.id }}" value="{{ report.plan_2024_2025|default:0 }}" /></td>
+                            <td><textarea name="comment_{{ indicator.id }}">{{ report.comment|default:'' }}</textarea></td>
+                        {% else %}
+                            <td><input type="number" name="plan_2022_2023_{{ indicator.id }}" value="0" /></td>
+                            <td><input type="number" name="actual_2023_2024_{{ indicator.id }}" value="0" /></td>
+                            <td><input type="number" name="plan_2024_2025_{{ indicator.id }}" value="0" /></td>
+                            <td><textarea name="comment_{{ indicator.id }}"></textarea></td>
+                        {% endif %}
+                    {% endwith %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit">Сохранить</button>
+</form>
+
+<!-- Форма выхода -->
+<form action="{% url 'logout' %}" method="POST" style="margin-top: 10px; color: red;">
+    {% csrf_token %}
+    <button type="submit">Выход</button>
+</form>
