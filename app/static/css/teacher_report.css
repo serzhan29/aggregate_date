@@ -1,14 +1,16 @@
-/* Стиль для страницы отчета учителя */
+/* Основной стиль для страницы */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    color: #333;
+    user-select: none; /* Запрет выделения текста */
 }
 
-h1 {
+h1, h3 {
     text-align: center;
-    margin: 20px 0;
+    margin-bottom: 20px;
     color: #333;
 }
 
@@ -18,44 +20,44 @@ form {
     margin: 20px auto;
     max-width: 90%;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+ul {
+    list-style: none;
+    padding: 0;
     margin-bottom: 20px;
 }
 
-table th, table td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-    word-break: break-word; /* Разбивает длинные слова для предотвращения переполнения */
+li {
+    display: flex;
+    align-items: center; /* Выравнивание по вертикали */
+    justify-content: space-between; /* Разделение метки и поля ввода */
+    margin-bottom: 15px;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd; /* Разделитель между элементами */
 }
 
-table thead {
-    background-color: #f4f4f4;
+label {
+    font-size: 16px;
+    color: #555;
 }
 
-table th {
-    background-color: #e2e2e2;
-    color: #333;
-}
-
-input[type="number"], textarea {
-    width: 100%;
+input[type="number"] {
+    width: 150px; /* Фиксированная ширина для полей */
     padding: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 16px; /* Увеличение шрифта для улучшения видимости */
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
 }
 
-textarea {
-    resize: vertical;
-    min-height: 100px;
+input[type="number"]:focus {
+    border-color: #007bff; /* Цвет рамки при фокусе */
 }
 
+/* Кнопка сохранения */
 button {
     background-color: #007bff;
     color: #fff;
@@ -63,45 +65,72 @@ button {
     padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 16px; /* Увеличение шрифта кнопок */
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+    width: 100%; /* Ширина кнопки 100% для мобильных */
 }
 
 button:hover {
     background-color: #0056b3;
 }
 
-button[type="submit"] {
-    margin-right: 10px;
-}
-
-form a {
+/* Улучшенный стиль для ссылки */
+a {
     display: inline-block;
-    margin: 10px 0;
-    text-decoration: none;
-    color: #007bff;
+    padding: 12px 25px;
+    background-color: #28a745; /* Зеленый цвет для фона */
+    color: #fff; /* Белый цвет текста */
+    border-radius: 30px; /* Закругленные углы для более "мягкого" дизайна */
+    text-decoration: none; /* Убираем подчеркивание */
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease; /* Плавный переход для всех свойств */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Легкая тень для объема */
+    text-align: center; /* Центрируем текст ссылки */
+    margin: 10px auto; /* Центрирование ссылки */
 }
 
-form a:hover {
-    text-decoration: underline;
+/* Стили для ссылок при наведении */
+a:hover {
+    background-color: #218838; /* Более темный зеленый при наведении */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Увеличение тени при наведении */
+    transform: translateY(-2px); /* Легкое поднятие ссылки */
 }
 
-/* Мобильные стили */
+/* Центрирование ссылок в контейнере */
+.container {
+    text-align: center; /* Центрируем текст ссылок */
+}
+
+/* Мобильная адаптация */
 @media (max-width: 768px) {
-    form {
-        padding: 15px;
-        margin: 15px auto;
+    li {
+        flex-direction: column; /* На мобильных устройствах элементы располагаются вертикально */
+        align-items: flex-start; /* Выравнивание по левому краю */
+        margin-bottom: 10px; /* Уменьшение отступа между элементами */
     }
 
-    table {
-        font-size: 14px; /* Уменьшение размера шрифта таблицы для мобильных устройств */
+    label {
+        margin-bottom: 5px; /* Отступ для метки на мобильных */
     }
 
-    input[type="number"], textarea {
-        font-size: 14px; /* Уменьшение размера шрифта для мобильных устройств */
+    input[type="number"] {
+        width: 100%; /* Поля ввода занимают всю ширину */
+        margin-top: 5px; /* Отступ сверху для полей ввода */
     }
 
     button {
-        font-size: 14px; /* Уменьшение размера шрифта кнопок для мобильных устройств */
-        padding: 8px 16px; /* Уменьшение внутреннего отступа кнопок */
+        padding: 12px; /* Увеличиваем отступы на мобильных */
+        font-size: 14px; /* Уменьшение шрифта на мобильных */
+        margin-top: 15px; /* Отступ сверху для кнопки */
+    }
+
+    /* Стили для ссылок на мобильных */
+    a {
+        width: auto; /* Ширина ссылки на мобильных */
+        padding: 12px; /* Увеличиваем отступы */
+        font-size: 14px; /* Уменьшение шрифта на мобильных */
+        margin: 10px auto; /* Центрирование ссылки */
     }
 }

@@ -1,13 +1,10 @@
 from django.contrib import admin
 from import_export import resources, fields
 from import_export.admin import ExportActionModelAdmin
-from .models import User, Indicator, TeacherReport, AdminReport
+from .models import User, Indicator, TeacherReport, AdminReport, MainIndicator, IndicatorSum
 from import_export.formats.base_formats import XLSX
 from django.http import HttpResponse
 from io import BytesIO
-from docx import Document
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
 from import_export.widgets import ForeignKeyWidget
 
 
@@ -67,45 +64,9 @@ class AdminReportAdmin(ExportActionModelAdmin):
         return obj.indicator.name
     indicator_name.short_description = 'Индикатор'
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        actions['export_to_pdf'] = (self.export_to_pdf, 'export_to_pdf', 'Export selected reports to PDF')
-        actions['export_to_word'] = (self.export_to_word, 'export_to_word', 'Export selected reports to Word')
-        return actions
+@admin.register(IndicatorSum)
+class AdminIndicatorSum(admin.ModelAdmin):
+    list_display = ('main_indicator', 'teacher', 'total_plan_2022_2023', 'total_actual_2023_2024', 'total_plan_2024_2025')
+    list_display_links = ('main_indicator',)
 
-    def export_to_pdf(self, request, queryset):
-        buffer = BytesIO()
-        p = canvas.Canvas(buffer, pagesize=letter)
-        width, height = letter
-        height -= 50
-
-        for obj in queryset:
-            p.drawString(100, height, f"Indicator: {obj.indicator.name}")
-            p.drawString(100, height - 20, f"Total Plan 2022-2023: {obj.total_plan_2022_2023}")
-            p.drawString(100, height - 40, f"Total Actual 2023-2024: {obj.total_actual_2023_2024}")
-            p.drawString(100, height - 60, f"Total Plan 2024-2025: {obj.total_plan_2024_2025}")
-            height -= 100
-
-        p.showPage()
-        p.save()
-
-        buffer.seek(0)
-        response = HttpResponse(buffer, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="admin_report.pdf"'
-        return response
-
-    def export_to_word(self, request, queryset):
-        doc = Document()
-        doc.add_heading('Admin Report', 0)
-
-        for obj in queryset:
-            doc.add_paragraph(f"Indicator: {obj.indicator.name}")
-            doc.add_paragraph(f"Total Plan 2022-2023: {obj.total_plan_2022_2023}")
-            doc.add_paragraph(f"Total Actual 2023-2024: {obj.total_actual_2023_2024}")
-            doc.add_paragraph(f"Total Plan 2024-2025: {obj.total_plan_2024_2025}")
-            doc.add_paragraph()
-
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename=admin_report.docx'
-        doc.save(response)
-        return response
+admin.site.register(MainIndicator)

@@ -1,45 +1,45 @@
-{% load static %}
-<link rel="stylesheet" href="{% static 'css/teacher_report.css' %}">
+{% extends 'base.html' %}
 
-<h1>Отчет учителя {{ user.last_name }}  {{ user.first_name }}</h1>
-<form method="POST">
+{% block title %}Отчет учителя {{ user.first_name }} 2023-2024{% endblock %}
+
+{% block content %}
+<h2>Отчеты учителя 2023-2024</h2>
+<form method="post">
     {% csrf_token %}
-    <table>
-        <thead>
-            <tr>
-                <th>Индикатор</th>
-                <th>План 2022-2023</th>
-                <th>Фактически 2023-2024</th>
-                <th>План 2024-2025</th>
-                <th>Комментарий</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for indicator in indicators %}
-                <tr>
-                    <td>{{ indicator.name }}</td>
-                    {% with report=reports_list|dictsort:"indicator.id"|first %}
-                        {% if report and report.indicator.id == indicator.id %}
-                            <td><input type="number" name="plan_2022_2023_{{ indicator.id }}" value="{{ report.plan_2022_2023|default:0 }}" /></td>
-                            <td><input type="number" name="actual_2023_2024_{{ indicator.id }}" value="{{ report.actual_2023_2024|default:0 }}" /></td>
-                            <td><input type="number" name="plan_2024_2025_{{ indicator.id }}" value="{{ report.plan_2024_2025|default:0 }}" /></td>
-                            <td><textarea name="comment_{{ indicator.id }}">{{ report.comment|default:'' }}</textarea></td>
-                        {% else %}
-                            <td><input type="number" name="plan_2022_2023_{{ indicator.id }}" value="0" /></td>
-                            <td><input type="number" name="actual_2023_2024_{{ indicator.id }}" value="0" /></td>
-                            <td><input type="number" name="plan_2024_2025_{{ indicator.id }}" value="0" /></td>
-                            <td><textarea name="comment_{{ indicator.id }}"></textarea></td>
-                        {% endif %}
-                    {% endwith %}
-                </tr>
+    {% for main_indicator in main_indicators %}
+        <h3>{{ main_indicator.name }}
+            {% for i in sum %}
+                {% if i.main_indicator.id == main_indicator.id %}
+                    {{ i.total_actual_2023_2024 }}
+                {% endif %}
             {% endfor %}
-        </tbody>
-    </table>
+        </h3>
+
+        <ul>
+            {% for indicator in main_indicator.indicator_set.all %}
+                <li>
+                    <label>
+                        {{ indicator.name }}
+                    </label>
+
+                    <!-- Извлекаем отчет для текущего индикатора -->
+                    {% for i in report_data %}
+                        {% if i.id == indicator.id %}
+                            {% with report_item=i %}
+                                <input type="number" name="actual_2023_2024_{{ indicator.id }}" value="{{ report_item.actual_2023_2024|default:0 }}">
+                            {% endwith %}
+                        {% else %}
+                                {% if i.indicator.id == indicator.id %}
+                                    {% with report_item=i %}
+                                        <input type="number" name="actual_2023_2024_{{ indicator.id }}" value="{{ report_item.actual_2023_2024|default:0 }}">
+                                    {% endwith %}
+                                {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
     <button type="submit">Сохранить</button>
 </form>
-
-<!-- Форма выхода -->
-<form action="{% url 'logout' %}" method="POST" style="margin-top: 10px; color: red;">
-    {% csrf_token %}
-    <button type="submit">Выход</button>
-</form>
+{% endblock %}

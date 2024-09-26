@@ -69,7 +69,7 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'aggregate',
+        'NAME': 'aggregate_db',
         'USER': 'root',
         'PASSWORD': 'kalikali123',
         'HOST': 'localhost',
