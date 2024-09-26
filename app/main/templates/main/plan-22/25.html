@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Отчет учителя {{ user.first_name }} 2024-2025{% endblock %}
+
+{% load static %}
+{% block content %}
+<h2>Отчеты учителя 2024-2025</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {% for main_indicator in main_indicators %}
+        <h3>{{ main_indicator.name }}
+            {% for i in sum %}
+                {% if i.main_indicator.id == main_indicator.id %}
+                    {{ i.total_plan_2024_2025 }}
+                {% endif %}
+            {% endfor %}
+        </h3>
+        <ul>
+            {% for indicator in main_indicator.indicator_set.all %}
+                <li>
+                    <label>{{ indicator.name }}</label>
+                    {% with report_item=None %}
+                        {% for i in report_data %}
+                            {% if i.indicator.id == indicator.id %}
+                                {% with report_item=i %}
+                                    <input type="number" name="plan_2024_2025_{{ indicator.id }}" value="{{ report_item.plan_2024_2025|default:0 }}">
+                                {% endwith %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    <button type="submit">Сохранить</button>
+</form>
+
+{% endblock %}

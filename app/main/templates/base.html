@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Отчет учителя{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/teacher_report.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Отчет учителя {{ user.first_name }}  {{ user.last_name }}</h1>
+        <nav>
+            <a href="{% url '23' user_id=user.id %}">2022-2023</a>
+            <a href="{% url 'teacher_report' user_id=user.id %}">2023-2024</a>
+            <a href="{% url '25' user_id=user.id %}">2024-2025</a>
+            <a href="{% url 'indicator_sum_view' user_id=user.id %}">Посчитать сумму индикаторов</a>
+            <form action="{% url 'logout' %}" method="post" style="display: inline-block; padding:0px;
+                                                            background-color: #f4f4f4;box-shadow: 0 0 0px rgba(0, 0, 0, 0);">
+                {% csrf_token %}
+                <button type="submit" class="logout-button">Выход</button>
+            </form>
+
+
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <!-- Здесь можно добавить подвал -->
+    </footer>
+</body>
+</html>

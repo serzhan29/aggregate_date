@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Суммированные индикаторы</h1>
+
+<form method="POST" action="{% url 'save_report_data' %}">
+    {% csrf_token %}
+    <table>
+        <thead>
+            <tr>
+                <th>Главный индикатор</th>
+                <th>План 2022-2023</th>
+                <th>Факт 2023-2024</th>
+                <th>План 2024-2025</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for indicator in total_indicators %}
+            <tr>
+                <td>{{ indicator.main_indicator.name }}</td>
+                <td>
+                    <input type="number" name="plan_2022_2023_{{ indicator.main_indicator.id }}" value="{{ indicator.total_plan_2022_2023 }}">
+                </td>
+                <td>
+                    <input type="number" name="actual_2023_2024_{{ indicator.main_indicator.id }}" value="{{ indicator.total_actual_2023_2024 }}">
+                </td>
+                <td>
+                    <input type="number" name="plan_2024_2025_{{ indicator.main_indicator.id }}" value="{{ indicator.total_plan_2024_2025 }}">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <input type="hidden" name="main_indicator_ids" value="{% for indicator in total_indicators %}{{ indicator.main_indicator.id }} {% endfor %}">
+    <button type="submit">Сохранить</button>
+</form>
+
+{% endblock %}

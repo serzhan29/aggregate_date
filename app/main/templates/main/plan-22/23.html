@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Отчет учителя {{ user.first_name }} 2022-2023{% endblock %}
+
+{% load static %}
+{% block content %}
+  <link rel="stylesheet" href="{% static 'css/teacher_report.css' %}">
+<h2>Отчеты учителя 2022-2023</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {% for main_indicator in main_indicators %}
+        <h3>{{ main_indicator.name }}
+            {% for i in sum %}
+                {% if i.main_indicator.id == main_indicator.id %}
+                    {{ i.total_plan_2022_2023 }}
+                {% endif %}
+            {% endfor %}
+        </h3>
+        <ul>
+            {% for indicator in main_indicator.indicator_set.all %}
+                <li>
+                    <label>{{ indicator.name }}
+                    </label>
+                    {% with report_item=None %}
+                        {% for i in report_data %}
+                            {% if i.id == indicator.id %}
+                                {% with report_item=i %}
+                                    <input type="number" name="plan_2022_2023_{{ indicator.id }}" value="{{ report_item.plan_2022_2023|default:0 }}">
+                                {% endwith %}
+                            {% else %}
+                                {% if i.indicator.id == indicator.id %}
+                                    {% with report_item=i %}
+                                        <input type="number" name="plan_2022_2023_{{ indicator.id }}" value="{{ report_item.plan_2022_2023|default:0 }}">
+                                    {% endwith %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    <button type="submit">Сохранить</button>
+</form>
+
+{% endblock %}
