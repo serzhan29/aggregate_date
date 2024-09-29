@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import TeacherReport, Indicator, AdminReport, User, MainIndicator, IndicatorSum
-from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import F, Sum
+
+
+
 
 def home(request):
     if not request.user.is_authenticated:
@@ -208,142 +209,25 @@ def teacher_report_25(request, user_id):
 
 
 #=========================Summa Indicators============================
-@login_required
-@user_passes_test(is_teacher)
-def indicator_sum_view(request, user_id):
-    main_indicators = MainIndicator.objects.prefetch_related('indicator_set').all()
-    total_indicators = []
-
-    # Суммируем значения по каждому главному индикатору
-    for main_indicator in main_indicators:
-        total_plan_2022_2023 = TeacherReport.objects.filter(
-            teacher=request.user,
-            main_indicator=main_indicator
-        ).aggregate(Sum('plan_2022_2023'))['plan_2022_2023__sum'] or 0
-
-        total_actual_2023_2024 = TeacherReport.objects.filter(
-            teacher=request.user,
-            main_indicator=main_indicator
-        ).aggregate(Sum('actual_2023_2024'))['actual_2023_2024__sum'] or 0
-
-        total_plan_2024_2025 = TeacherReport.objects.filter(
-            teacher=request.user,
-            main_indicator=main_indicator
-        ).aggregate(Sum('plan_2024_2025'))['plan_2024_2025__sum'] or 0
-
-        total_indicators.append({
-            'main_indicator': main_indicator,
-            'total_plan_2022_2023': total_plan_2022_2023,
-            'total_actual_2023_2024': total_actual_2023_2024,
-            'total_plan_2024_2025': total_plan_2024_2025,
-        })
-
-    context = {
-        'total_indicators': total_indicators,
-    }
-    return render(request, 'main/indicator_sum.html', context)
-
-@login_required
-@user_passes_test(is_teacher)
-def save_indicator_sum(request):
-    if request.method == 'POST':
-        main_indicator_ids = request.POST.getlist('main_indicator_ids')
-        total_plan_2022_2023 = request.POST.getlist('total_plan_2022_2023')
-        total_actual_2023_2024 = request.POST.getlist('total_actual_2023_2024')
-        total_plan_2024_2025 = request.POST.getlist('total_plan_2024_2025')
-
-        for main_indicator_id, plan_2022_2023, actual_2023_2024, plan_2024_2025 in zip(main_indicator_ids, total_plan_2022_2023, total_actual_2023_2024, total_plan_2024_2025):
-            IndicatorSum.objects.update_or_create(
-                teacher=request.user,
-                main_indicator_id=main_indicator_id,
-                defaults={
-                    'total_plan_2022_2023': float(plan_2022_2023),
-                    'total_actual_2023_2024': float(actual_2023_2024),
-                    'total_plan_2024_2025': float(plan_2024_2025),
-                }
-            )
-
-        # Перенаправление после сохранения
-        return redirect('teacher_report', user_id=request.user.id)
-
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 #====================================================================
-@login_required
-@user_passes_test(is_teacher)
-def sum_report_data_view(request, user_id):
-    # Получаем все главные индикаторы
-    main_indicators = MainIndicator.objects.prefetch_related('indicator_set').all()
-    total_indicators = []
+def teacher_report_summary(request, user_id):
+    # Получаем объект User (учителя)
+    teacher = get_object_or_404(User, id=user_id)
 
-    # Суммируем значения по каждому главному индикатору
-    for main_indicator in main_indicators:
-        total_plan_2022_2023 = 0
-        total_actual_2023_2024 = 0
-        total_plan_2024_2025 = 0
+    # Получаем все связанные с ним суммы индикаторов
+    indicator_sums = IndicatorSum.objects.filter(teacher=teacher)
 
-        # Суммируем значения, полученные из формы
-        for indicator in main_indicator.indicator_set.all():
-            # Получаем значения из формы
-            plan_2022_2023 = request.POST.get(f'plan_2022_2023_{indicator.id}', 0)
-            actual_2023_2024 = request.POST.get(f'actual_2023_2024_{indicator.id}', 0)
-            plan_2024_2025 = request.POST.get(f'plan_2024_2025_{indicator.id}', 0)
-
-            total_plan_2022_2023 += float(plan_2022_2023)
-            total_actual_2023_2024 += float(actual_2023_2024)
-            total_plan_2024_2025 += float(plan_2024_2025)
-
-        total_indicators.append({
-            'main_indicator': main_indicator,
-            'total_plan_2022_2023': total_plan_2022_2023,
-            'total_actual_2023_2024': total_actual_2023_2024,
-            'total_plan_2024_2025': total_plan_2024_2025,
-        })
+    # Вызываем метод aggregate_reports для каждого объекта
+    for indicator_sum in indicator_sums:
+        indicator_sum.aggregate_reports()  # Этот метод должен быть в модели IndicatorSum
 
     context = {
-        'total_indicators': total_indicators,
+        'teacher': teacher,
+        'indicator_sums': indicator_sums,
     }
-    return render(request, 'main/new_sum.html', context)
 
-@login_required
-@user_passes_test(is_teacher)
-def save_report_data(request):
-    if request.method == 'POST':
-        main_indicator_ids = request.POST.getlist('main_indicator_ids')
-        total_indicators_data = []
+    return render(request, 'main/new_sum2.html', context)
 
-        # Получаем и суммируем значения для сохранения
-        for main_indicator_id in main_indicator_ids:
-            total_plan_2022_2023 = 0
-            total_actual_2023_2024 = 0
-            total_plan_2024_2025 = 0
-
-            for indicator_id in Indicator.objects.filter(main_indicator_id=main_indicator_id).values_list('id', flat=True):
-                plan_2022_2023 = request.POST.get(f'plan_2022_2023_{indicator_id}', 0)
-                actual_2023_2024 = request.POST.get(f'actual_2023_2024_{indicator_id}', 0)
-                plan_2024_2025 = request.POST.get(f'plan_2024_2025_{indicator_id}', 0)
-
-                total_plan_2022_2023 += float(plan_2022_2023)
-                total_actual_2023_2024 += float(actual_2023_2024)
-                total_plan_2024_2025 += float(plan_2024_2025)
-
-            total_indicators_data.append((main_indicator_id, total_plan_2022_2023, total_actual_2023_2024, total_plan_2024_2025))
-
-        # Сохраняем в базу данных
-        for main_indicator_id, plan_2022_2023, actual_2023_2024, plan_2024_2025 in total_indicators_data:
-            IndicatorSum.objects.update_or_create(
-                teacher=request.user,
-                main_indicator_id=main_indicator_id,
-                defaults={
-                    'total_plan_2022_2023': plan_2022_2023,
-                    'total_actual_2023_2024': actual_2023_2024,
-                    'total_plan_2024_2025': plan_2024_2025,
-                }
-            )
-
-        # Перенаправление после сохранения
-        return redirect('teacher_report', user_id=request.user.id)
-
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 #====================================================================

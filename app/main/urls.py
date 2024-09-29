@@ -16,13 +16,11 @@ urlpatterns = [
     # Путь для просмотра детальной информации по отдельному индикатору
     path('reports/report-details/<int:indicator_id>/', views.report_details, name='report_details'),
 
-    path('indicator-sum/<int:user_id>/', views.indicator_sum_view, name='indicator_sum_view'),
     path('plan-2022-2023/<int:user_id>/', views.teacher_report_23, name='23'),
     path('plan-2024-2025/<int:user_id>/', views.teacher_report_25, name='25'),
-    path('save_indicator_sum/', views.save_indicator_sum, name='save_indicator_sum'),
 
-    path('report/sum/<int:user_id>/', views.sum_report_data_view, name='sum_report_data'),
-    path('report/save/', views.save_report_data, name='save_report_data'),
+
+    path('teacher-report-summary/<int:user_id>/', views.teacher_report_summary, name='teacher-report-summary'),
 
     # Пути для регистрации, входа и выхода пользователя
     path('register/', views.register, name='register'),
