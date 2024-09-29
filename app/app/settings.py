@@ -17,7 +17,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 CSRF_COOKIE_SECURE=False
 CSRF_COOKIE_HTTPONLY=False
-CSRF_TRUSTED_ORIGINS=['https://fe93-2-134-186-155.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS=['https://9772-89-218-157-234.ngrok-free.app']
 
 # Application definition
 
