@@ -1,0 +1,40 @@
+body {
+    background-color: #f8f9fa; /* Светлый фон для всей страницы */
+}
+
+h1 {
+    color: #343a40; /* Темный цвет для заголовка */
+    font-size: 2.5rem; /* Размер шрифта заголовка */
+}
+
+.table {
+    background-color: #ffffff; /* Белый фон для таблицы */
+    border-radius: 0.5rem; /* Закругленные углы */
+    overflow: hidden; /* Скрыть переполнение */
+}
+
+.table th {
+    background-color: #007bff; /* Цвет заголовка таблицы */
+    color: #ffffff; /* Цвет текста заголовка */
+    font-weight: bold; /* Полужирный текст заголовка */
+}
+
+.table td {
+    font-weight: 500; /* Полужирный текст для ячеек */
+}
+
+.table tr:hover {
+    background-color: #e9ecef; /* Цвет при наведении на строку */
+}
+
+.table td, .table th {
+    padding: 12px; /* Отступы в ячейках */
+}
+
+.table-responsive {
+    margin-top: 20px; /* Отступ сверху для адаптивной таблицы */
+}
+
+.shadow-sm {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Легкая тень для таблицы */
+}
