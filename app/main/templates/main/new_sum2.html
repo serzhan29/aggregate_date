@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Отчет учителя: {{ teacher.first_name }} 2023-2024{% endblock %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/sum.css' %}">
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Сумма всех индикаторов</h1>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered shadow-sm">
+            <thead class="thead-light">
+                <tr>
+                    <th>Индикатор</th>
+                    <th>План 2022-2023</th>
+                    <th>Фактические 2023-2024</th>
+                    <th>План 2024-2025</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for indicator_sum in indicator_sums %}
+                <tr>
+                    <td>{{ indicator_sum.main_indicator.name }}</td>
+                    <td>{{ indicator_sum.total_plan_2022_2023 }}</td>
+                    <td>{{ indicator_sum.total_actual_2023_2024 }}</td>
+                    <td>{{ indicator_sum.total_plan_2024_2025 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

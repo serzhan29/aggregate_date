@@ -43,6 +43,7 @@ class User(AbstractUser):
 
 
 class MainIndicator(models.Model):
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField('Главный индикатор: ', max_length=255, unique=True)
     amount_2022_2023 = models.IntegerField('Суммарный план 2022-2023: ', default=0)
     amount_2023_2024 = models.IntegerField('Суммарные выполненные показатели 2023-2024', default=0)
@@ -147,3 +148,28 @@ class IndicatorSum(models.Model):
         verbose_name = 'Сумма Индикатора'
         verbose_name_plural = 'Сумма Индикаторов'
 
+    def aggregate_reports(self):
+        # Получаем все индикаторы, связанные с текущим основным индикатором
+        indicators = Indicator.objects.filter(main_name=self.main_indicator)
+
+        # Считаем суммы по отчетам для данного учителя
+        total_plan_2022_2023 = TeacherReport.objects.filter(
+            indicator__in=indicators,
+            teacher=self.teacher
+        ).aggregate(total=Sum('plan_2022_2023'))['total'] or 0
+
+        total_actual_2023_2024 = TeacherReport.objects.filter(
+            indicator__in=indicators,
+            teacher=self.teacher
+        ).aggregate(total=Sum('actual_2023_2024'))['total'] or 0
+
+        total_plan_2024_2025 = TeacherReport.objects.filter(
+            indicator__in=indicators,
+            teacher=self.teacher
+        ).aggregate(total=Sum('plan_2024_2025'))['total'] or 0
+
+        # Обновляем значения в текущем объекте
+        self.total_plan_2022_2023 = total_plan_2022_2023
+        self.total_actual_2023_2024 = total_actual_2023_2024
+        self.total_plan_2024_2025 = total_plan_2024_2025
+        self.save()
