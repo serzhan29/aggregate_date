@@ -14,12 +14,13 @@
             <a href="{% url '23' user_id=user.id %}">2022-2023</a>
             <a href="{% url 'teacher_report' user_id=user.id %}">2023-2024</a>
             <a href="{% url '25' user_id=user.id %}">2024-2025</a>
-            <a href="{% url 'indicator_sum_view' user_id=user.id %}">Посчитать сумму индикаторов</a>
+            <a href="{% url 'teacher-report-summary' user.id %}">Посчитать сумму индикаторов</a>
             <form action="{% url 'logout' %}" method="post" style="display: inline-block; padding:0px;
                                                             background-color: #f4f4f4;box-shadow: 0 0 0px rgba(0, 0, 0, 0);">
                 {% csrf_token %}
                 <button type="submit" class="logout-button">Выход</button>
             </form>
+
 
 
         </nav>
