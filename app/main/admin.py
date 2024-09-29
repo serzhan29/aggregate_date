@@ -3,8 +3,6 @@ from import_export import resources, fields
 from import_export.admin import ExportActionModelAdmin
 from .models import User, Indicator, TeacherReport, AdminReport, MainIndicator, IndicatorSum
 from import_export.formats.base_formats import XLSX
-from django.http import HttpResponse
-from io import BytesIO
 from import_export.widgets import ForeignKeyWidget
 
 
@@ -64,9 +62,39 @@ class AdminReportAdmin(ExportActionModelAdmin):
         return obj.indicator.name
     indicator_name.short_description = 'Индикатор'
 
+# Ресурс для модели IndicatorSum
+class IndicatorSumResource(resources.ModelResource):
+    main_indicator = fields.Field(
+        column_name='Основной Индикатор',
+        attribute='main_indicator'
+    )
+    teacher = fields.Field(
+        column_name='Учитель',
+        attribute='teacher'
+    )
+    total_plan_2022_2023 = fields.Field(
+        column_name='Суммарный план 2022-2023',
+        attribute='total_plan_2022_2023'
+    )
+    total_actual_2023_2024 = fields.Field(
+        column_name='Суммарные выполненные показатели 2023-2024',
+        attribute='total_actual_2023_2024'
+    )
+    total_plan_2024_2025 = fields.Field(
+        column_name='Суммарный план на 2024-2025',
+        attribute='total_plan_2024_2025'
+    )
+
+    class Meta:
+        model = IndicatorSum
+        fields = ('main_indicator', 'teacher', 'total_plan_2022_2023', 'total_actual_2023_2024', 'total_plan_2024_2025')
+
+# Определение админки для модели IndicatorSum
 @admin.register(IndicatorSum)
-class AdminIndicatorSum(admin.ModelAdmin):
+class AdminIndicatorSum(ExportActionModelAdmin):
+    resource_class = IndicatorSumResource
     list_display = ('main_indicator', 'teacher', 'total_plan_2022_2023', 'total_actual_2023_2024', 'total_plan_2024_2025')
     list_display_links = ('main_indicator',)
+    formats = [XLSX]  # Добавьте формат XLSX для экспорта
 
 admin.site.register(MainIndicator)
