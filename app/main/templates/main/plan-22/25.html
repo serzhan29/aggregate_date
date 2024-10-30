@@ -8,32 +8,72 @@
 
 <form method="post">
     {% csrf_token %}
-    {% for main_indicator in main_indicators %}
-        <h3>{{ main_indicator.name }}
-            {% for i in sum %}
-                {% if i.main_indicator.id == main_indicator.id %}
-                    {{ i.total_plan_2024_2025 }}
-                {% endif %}
-            {% endfor %}
-        </h3>
-        <ul>
-            {% for indicator in main_indicator.indicator_set.all %}
-                <li>
-                    <label>{{ indicator.name }}</label>
-                    {% with report_item=None %}
-                        {% for i in report_data %}
-                            {% if i.indicator.id == indicator.id %}
-                                {% with report_item=i %}
-                                    <input type="number" name="plan_2024_2025_{{ indicator.id }}" value="{{ report_item.plan_2024_2025|default:0 }}">
-                                {% endwith %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endwith %}
-                </li>
-            {% endfor %}
-        </ul>
+
+    <!-- Проходимся по направлениям -->
+    {% for dir in direction %}
+        <div class="direction-container" style="margin-bottom: 20px;">
+            <h3 style="display: inline-block;">
+                {{ dir.name }}
+            </h3>
+
+            <!-- Кнопка для раскрытия/скрытия главных индикаторов -->
+            <button type="button" class="toggle-button" onclick="toggleSection('main_indicators_{{ dir.id }}')"
+                style="display: inline-block; margin-left: 10px; padding: 5px 10px; font-size: 18px;
+                cursor: pointer; border: none;
+                background-color: lawngreen;
+                color: black;
+                border-radius: 5px;
+                width: 10%">
+                Показать/Скрыть
+            </button>
+
+            <!-- Блок с главными индикаторами, скрыт по умолчанию -->
+            <div id="main_indicators_{{ dir.id }}" class="main-indicators" style="display: none; margin-top: 10px;">
+                <!-- Проходимся по главным индикаторам, связанным с текущим направлением -->
+                {% for main_indicator in main_indicators %}
+                    {% if main_indicator.direction == dir %}
+                        <h4>{{ main_indicator.name }}
+                            {% for i in sum %}
+                                {% if i.main_indicator.id == main_indicator.id %}
+                                    {{ i.total_plan_2024_2025 }}
+                                {% endif %}
+                            {% endfor %}
+                        </h4>
+
+                        <ul>
+                            <!-- Отображаем все связанные показатели для текущего главного индикатора -->
+                            {% for indicator in main_indicator.indicator_set.all %}
+                                <li>
+                                    <label>{{ indicator.name }}</label>
+
+                                    <!-- Извлекаем отчет для текущего показателя -->
+                                    {% for i in report_data %}
+                                        {% if i.indicator.id == indicator.id %}
+                                            <input type="number" name="plan_2024_2025_{{ indicator.id }}" value="{{ i.plan_2024_2025|default:0 }}">
+                                        {% endif %}
+                                    {% endfor %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
     {% endfor %}
+
     <button type="submit">Сохранить</button>
 </form>
+
+<!-- Добавляем JS для скрытия/раскрытия блоков -->
+<script>
+    function toggleSection(sectionId) {
+        var section = document.getElementById(sectionId);
+        if (section.style.display === "none") {
+            section.style.display = "block";
+        } else {
+            section.style.display = "none";
+        }
+    }
+</script>
 
 {% endblock %}

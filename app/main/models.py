@@ -7,6 +7,7 @@ from django.conf import settings
 
 
 class User(AbstractUser):
+    """Пользователи"""
     # Поле для роли пользователя (учитель или администратор)
     ROLE_CHOICES = [
         ('teacher', 'Учитель'),
@@ -42,8 +43,23 @@ class User(AbstractUser):
     )
 
 
+class Direction(models.Model):
+    """ Направление (Академическое, Научное и т.д.) """
+    name = models.CharField('Название: ', max_length=255)
+
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Направление'
+        verbose_name_plural = 'Направление '
+
+
 class MainIndicator(models.Model):
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE)
+    """Название Главного индикатора """
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    direction = models.ForeignKey(Direction, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField('Главный индикатор: ', max_length=255, unique=True)
     amount_2022_2023 = models.IntegerField('Суммарный план 2022-2023: ', default=0)
     amount_2023_2024 = models.IntegerField('Суммарные выполненные показатели 2023-2024', default=0)
@@ -59,6 +75,7 @@ class MainIndicator(models.Model):
 
 # Модель для индикативных показателей
 class Indicator(models.Model):
+    """ Под индикатор """
     main_name = models.ForeignKey(MainIndicator, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField('Название индикатора: ', max_length=255)  # (например, публикации в Scopus)
     unit = models.CharField('Единица измерения:', max_length=50)  # (счет, проценты и т.д.)
@@ -74,6 +91,7 @@ class Indicator(models.Model):
 
 # Модель для хранения отчетов учителей
 class TeacherReport(models.Model):
+    """ Отчёт учителей """
     teacher = models.ForeignKey(User, on_delete=models.CASCADE,
                                 limit_choices_to={'role': 'teacher'})  # Связь с учителем
     main_indicator = models.ForeignKey(MainIndicator, on_delete=CASCADE, blank=True, null=True)
@@ -97,6 +115,7 @@ class TeacherReport(models.Model):
 
 # Агрегация данных для администратора
 class AdminReport(models.Model):
+    """ Общая сумма всех индикаторов """
     indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE)
     total_plan_2022_2023 = models.IntegerField('Суммарный план 2022-2023: ', default=0)
     total_actual_2023_2024 = models.IntegerField('Суммарные выполненные показатели 2023-2024', default=0)
@@ -135,6 +154,7 @@ class AdminReport(models.Model):
 
 
 class IndicatorSum(models.Model):
+    """ Сумма всех индикаторов """
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     main_indicator = models.ForeignKey(MainIndicator, on_delete=models.CASCADE)
     total_plan_2022_2023 = models.FloatField(default=0)

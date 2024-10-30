@@ -17,7 +17,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 CSRF_COOKIE_SECURE=False
 CSRF_COOKIE_HTTPONLY=False
-CSRF_TRUSTED_ORIGINS=['https://9772-89-218-157-234.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS=['https://4fd1-89-218-157-234.ngrok-free.app']
 
 # Application definition
 
@@ -131,7 +131,7 @@ JAZZMIN_SETTINGS = {
     "site_header": "Админ панель",
 
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_brand": "Админка2",
+    "site_brand": "Админка",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
     "site_logo": "/img/logo.jpg",

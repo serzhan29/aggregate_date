@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import TeacherReport, Indicator, AdminReport, User, MainIndicator, IndicatorSum
+from .models import TeacherReport, Indicator, AdminReport, User, MainIndicator, IndicatorSum, Direction
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
@@ -81,6 +81,8 @@ def teacher_report(request, user_id):
     # Получаем главные индикаторы и отчеты учителя
     main_indicators = MainIndicator.objects.prefetch_related('indicator_set').all()
     reports = TeacherReport.objects.filter(teacher=request.user)
+    direction = Direction.objects.filter(mainindicator__in=main_indicators).distinct()
+
 
     # Получаем суммарные индикаторы для текущего учителя
     sum_indicators = IndicatorSum.objects.filter(teacher=request.user)
@@ -117,6 +119,7 @@ def teacher_report(request, user_id):
         'main_indicators': main_indicators,
         'sum': sum_indicators,  # Добавляем суммарные индикаторы
         'report_data': reports,
+        'direction': direction
     }
     return render(request, 'main/teacher_report.html', context)
 
@@ -130,6 +133,7 @@ def teacher_report_23(request, user_id):
     main_indicators = MainIndicator.objects.prefetch_related('indicator_set').all()
     reports = TeacherReport.objects.filter(teacher=request.user)
     sum_indicators = IndicatorSum.objects.filter(teacher=request.user)
+    direction = Direction.objects.filter(mainindicator__in=main_indicators).distinct()
     # Создаем словарь для хранения отчетов по индикаторам
     report_data = {}
     for report in reports:
@@ -162,6 +166,7 @@ def teacher_report_23(request, user_id):
         'main_indicators': main_indicators,
         'sum': sum_indicators,  # Добавляем суммарные индикаторы
         'report_data': reports,  # Передаем существующие данные отчета
+        'direction': direction
     }
     return render(request, 'main/plan-22/23.html', context)
 
@@ -172,6 +177,7 @@ def teacher_report_25(request, user_id):
     main_indicators = MainIndicator.objects.prefetch_related('indicator_set').all()
     reports = TeacherReport.objects.filter(teacher=request.user)
     sum_indicators = IndicatorSum.objects.filter(teacher=request.user)
+    direction = Direction.objects.filter(mainindicator__in=main_indicators).distinct()
     # Создаем словарь для хранения отчетов по индикаторам
     report_data = {}
     for report in reports:
@@ -204,6 +210,7 @@ def teacher_report_25(request, user_id):
         'main_indicators': main_indicators,
         'sum': sum_indicators,  # Добавляем суммарные индикаторы
         'report_data': reports,  # Передаем существующие данные отчета
+        'direction': direction
     }
     return render(request, 'main/plan-22/25.html', context)
 
@@ -214,12 +221,24 @@ def teacher_report_summary(request, user_id):
     # Получаем объект User (учителя)
     teacher = get_object_or_404(User, id=user_id)
 
-    # Получаем все связанные с ним суммы индикаторов
-    indicator_sums = IndicatorSum.objects.filter(teacher=teacher)
+    # Определите основной индикатор, который должен быть связан с учителем.
+    main_indicators = MainIndicator.objects.all()  # Допустим, вы хотите для всех индикаторов создать записи.
 
-    # Вызываем метод aggregate_reports для каждого объекта
-    for indicator_sum in indicator_sums:
-        indicator_sum.aggregate_reports()  # Этот метод должен быть в модели IndicatorSum
+    # Цикл по всем индикаторам и создание записей, если их нет.
+    indicator_sums = []
+    for main_indicator in main_indicators:
+        indicator_sum, created = IndicatorSum.objects.get_or_create(
+            teacher=teacher,
+            main_indicator=main_indicator,  # Замените это на правильное поле
+            defaults={
+                'total_plan_2022_2023': 0,  # Установите значения по умолчанию
+                'total_actual_2023_2024': 0,
+                'total_plan_2024_2025': 0,
+            }
+        )
+        # Вызываем метод aggregate_reports для каждого объекта
+        indicator_sum.aggregate_reports()
+        indicator_sums.append(indicator_sum)
 
     context = {
         'teacher': teacher,
@@ -227,6 +246,7 @@ def teacher_report_summary(request, user_id):
     }
 
     return render(request, 'main/new_sum2.html', context)
+
 
 
 

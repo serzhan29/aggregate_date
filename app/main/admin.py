@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export import resources, fields
 from import_export.admin import ExportActionModelAdmin
-from .models import User, Indicator, TeacherReport, AdminReport, MainIndicator, IndicatorSum
+from .models import User, Indicator, TeacherReport, AdminReport, MainIndicator, IndicatorSum, Direction
 from import_export.formats.base_formats import XLSX
 from import_export.widgets import ForeignKeyWidget
 
@@ -98,3 +98,4 @@ class AdminIndicatorSum(ExportActionModelAdmin):
     formats = [XLSX]  # Добавьте формат XLSX для экспорта
 
 admin.site.register(MainIndicator)
+admin.site.register(Direction)
