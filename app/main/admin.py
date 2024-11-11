@@ -1,10 +1,10 @@
 from django.contrib import admin
 from import_export import resources, fields
 from import_export.admin import ExportActionModelAdmin
-from .models import User, Indicator, TeacherReport, AdminReport, MainIndicator, IndicatorSum, Direction
+from .models import (User, Indicator, TeacherReport, AdminReport, MainIndicator, IndicatorSum,
+                     Direction, Coauthor, CoauthorScore, Article)
 from import_export.formats.base_formats import XLSX
 from import_export.widgets import ForeignKeyWidget
-
 
 # Настройка админки для кастомной модели User
 @admin.register(User)
@@ -99,3 +99,6 @@ class AdminIndicatorSum(ExportActionModelAdmin):
 
 admin.site.register(MainIndicator)
 admin.site.register(Direction)
+admin.site.register(Coauthor)
+admin.site.register(CoauthorScore)
+admin.site.register(Article)

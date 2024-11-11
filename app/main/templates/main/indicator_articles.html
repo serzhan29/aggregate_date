@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Статьи по индикатору {{ indicator.name }}{% endblock %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/articles.css' %}">
+
+<div class="indicator-articles-container">
+    <h2 class="indicator-articles-header">Статьи по индикатору: {{ indicator.name }}</h2>
+
+<a href="{% url 'indicator_articles_by_year' indicator_id=indicator.id deadline_year=2023 %}">2023</a>
+<a href="{% url 'indicator_articles_by_year' indicator_id=indicator.id deadline_year=2024 %}">2024</a>
+<a href="{% url 'indicator_articles_by_year' indicator_id=indicator.id deadline_year=2025 %}">2025</a>
+<a href="{% url 'indicator_articles' indicator_id=indicator.id  %}">Все года</a>
+
+        {% if articles %}
+            <h2>Статьи с окончанием в {{ selected_year|default:"все годы" }}</h2>
+            <table class="indicator-articles-table">
+                <thead>
+                    <tr>
+                        <th>Название статьи</th>
+                        <th>Главный автор</th>
+                        <th>Соавторы</th>
+                        <th>Дата начала</th>
+                        <th>Срок окончания</th>
+                        <th>Комментарии</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article in articles %}
+                        <tr>
+                            <td>{{ article.title }}</td>
+                            <td>{{ article.teacher.get_full_name }}</td>
+                            <td>
+                                {% if article.coauthors.all %}
+                                    {% for coauthor in article.coauthors.all %}
+                                        {{ coauthor.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <em>Соавторов нет</em>
+                                {% endif %}
+                            </td>
+                            <td>{{ article.start|default:"Не указана" }}</td>
+                            <td>{{ article.deadline|default:"Не указан" }}</td>
+                            <td>{{ article.comments|default:"Нет комментариев" }}</td>
+                            <td>
+                                {% if article.file %}
+                                   <a href="{{ article.file.url }}" style="background-color: blue; font-size: 14px;">Скачать файл</a><br>
+                                {% endif %}
+                                <a href="{% url 'edit_article' article.id %}">Редактировать</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Пока нет добавленных статей для выбранного года.</p>
+        {% endif %}
+
+
+    <hr>
+
+    <h3>Добавить новую статью</h3>
+    <form method="post" enctype="multipart/form-data" class="indicator-articles-form">
+        {% csrf_token %}
+        <label for="title">Название статьи:</label>
+        <input type="text" name="title" class="indicator-input" required>
+
+        <label for="coauthors">Выберите соавторов:</label>
+        <select name="coauthors" multiple class="indicator-input">
+            {% for teacher in teachers %}
+                <option value="{{ teacher.id }}">{{ teacher.get_full_name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="comments">Комментарии:</label>
+        <textarea name="comments" class="indicator-textarea" rows="4" cols="50"></textarea>
+
+        <label for="file">Загрузите файл:</label>
+        <input type="file" name="file" class="indicator-input">
+
+        <!-- Field for start date -->
+        <label for="start">Дата начала:</label>
+        <input type="date" name="start" class="indicator-input">
+
+        <!-- Field for end date -->
+        <label for="deadline">Срок окончания:</label>
+        <input type="date" name="deadline" class="indicator-input">
+
+        <button type="submit" class="indicator-submit-button">Добавить статью</button>
+    </form>
+{% endblock %}

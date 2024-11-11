@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import TeacherReport, Indicator, AdminReport, User, MainIndicator, IndicatorSum, Direction
+from .models import TeacherReport, Indicator, AdminReport, User, MainIndicator, IndicatorSum, Direction, Article
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-
-
+from django.db.models import Q
+from django.contrib import messages
+from django.utils.dateparse import parse_date
 
 
 def home(request):
@@ -78,13 +79,9 @@ def is_admin(user):
 @login_required
 @user_passes_test(is_teacher)
 def teacher_report(request, user_id):
-    # Получаем главные индикаторы и отчеты учителя
     main_indicators = MainIndicator.objects.prefetch_related('indicator_set').all()
     reports = TeacherReport.objects.filter(teacher=request.user)
     direction = Direction.objects.filter(mainindicator__in=main_indicators).distinct()
-
-
-    # Получаем суммарные индикаторы для текущего учителя
     sum_indicators = IndicatorSum.objects.filter(teacher=request.user)
 
     # Если у учителя нет отчетов, создаем их с нулевыми значениями
@@ -99,7 +96,6 @@ def teacher_report(request, user_id):
                 comment=''
             )
 
-    # Обновляем отчеты после создания, чтобы получить актуальные данные
     reports = TeacherReport.objects.filter(teacher=request.user)
     report_data = {report.indicator.id: report for report in reports}
 
@@ -115,18 +111,140 @@ def teacher_report(request, user_id):
 
         return redirect('teacher_report', user_id=user_id)
 
+    # Filter articles to only those with start date in 2023 and end date in 2024
+    articles = Article.objects.filter(
+        teacher=request.user,
+        deadline__year=2024
+    )
+
     context = {
         'main_indicators': main_indicators,
-        'sum': sum_indicators,  # Добавляем суммарные индикаторы
+        'sum': sum_indicators,
         'report_data': reports,
-        'direction': direction
+        'direction': direction,
+        'articles': articles  # Filtered articles for display
     }
     return render(request, 'main/teacher_report.html', context)
 
 
+#++++++++++++++++++++++++++++++++
+""""""
+
+from django.utils.dateparse import parse_date
 
 
+@login_required
+def indicator_articles(request, indicator_id, deadline_year=None):
+    indicator = get_object_or_404(Indicator, id=indicator_id)
 
+    # Фильтруем статьи, связанные с индикатором и текущим пользователем
+    articles = Article.objects.filter(indicator=indicator).filter(
+        Q(teacher=request.user) | Q(coauthors=request.user)
+    ).distinct()
+
+    # Если передан параметр `deadline_year`, фильтруем статьи по году окончания
+    if deadline_year:
+        articles = articles.filter(deadline__year=deadline_year)
+
+    users = User.objects.filter(role='teacher').exclude(id=request.user.id)
+
+
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        coauthors_ids = request.POST.getlist('coauthors')
+        comments = request.POST.get('comments')
+        file = request.FILES.get('file')
+
+        # Парсим даты начала и окончания
+        start = parse_date(request.POST.get('start'))
+        deadline = parse_date(request.POST.get('deadline'))
+
+        # Создаем новую статью
+        article = Article.objects.create(
+            title=title,
+            indicator=indicator,
+            teacher=request.user,
+            comments=comments,
+            file=file,
+            start=start,
+            deadline=deadline
+        )
+        article.coauthors.add(*coauthors_ids)
+
+        return redirect('indicator_articles', indicator_id=indicator_id)
+
+    context = {
+        'indicator': indicator,
+        'articles': articles,
+        'teachers': users,
+        'selected_year': deadline_year,  # Передаем выбранный год для фильтрации
+    }
+    return render(request, 'main/indicator_articles.html', context)
+
+
+@login_required
+def edit_article(request, article_id):
+    article = get_object_or_404(Article, id=article_id)
+
+    # Проверка, что текущий пользователь является либо главным автором, либо соавтором
+    if article.teacher != request.user and request.user not in article.coauthors.all():
+        return HttpResponseForbidden("У вас нет прав на редактирование этой статьи.")
+
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        coauthors_ids = request.POST.getlist('coauthors')
+        comments = request.POST.get('comments')
+        file = request.FILES.get('file')
+
+        # Парсим дату окончания и начала
+        start = parse_date(request.POST.get('start'))
+        deadline = parse_date(request.POST.get('deadline'))
+
+        # Обновляем данные статьи
+        article.title = title
+        article.comments = comments
+        article.start = start
+        article.deadline = deadline
+        article.coauthors.clear()  # Удаляем старых соавторов
+        article.coauthors.add(*coauthors_ids)  # Добавляем новых соавторов
+
+        # Обновляем файл, если загружен новый
+        if file:
+            article.file = file
+
+        article.save()  # Сохраняем изменения
+
+        return redirect('indicator_articles', indicator_id=article.indicator.id)
+
+    users = User.objects.filter(role='teacher').exclude(id=request.user.id)
+
+    context = {
+        'article': article,
+        'teachers': users
+    }
+    return render(request, 'main/edit_article.html', context)
+
+
+@login_required
+def delete_article(request, article_id):
+    article = get_object_or_404(Article, id=article_id)
+
+    # Проверяем, что текущий пользователь является либо главным автором, либо соавтором
+    if article.teacher != request.user and request.user not in article.coauthors.all():
+        return HttpResponseForbidden("У вас нет прав на удаление этой статьи.")
+
+    if request.method == 'POST':
+        article.delete()  # Удаляем статью
+        messages.success(request, "Статья успешно удалена.")
+        return redirect('indicator_articles', indicator_id=article.indicator.id)
+
+    context = {
+        'article': article
+    }
+    return render(request, 'main/delete_article.html', context)
+
+
+#++++++++++++++++++++++++++++++++++
 @login_required
 @user_passes_test(is_teacher)
 def teacher_report_23(request, user_id):
@@ -134,13 +252,21 @@ def teacher_report_23(request, user_id):
     reports = TeacherReport.objects.filter(teacher=request.user)
     sum_indicators = IndicatorSum.objects.filter(teacher=request.user)
     direction = Direction.objects.filter(mainindicator__in=main_indicators).distinct()
+
     # Создаем словарь для хранения отчетов по индикаторам
     report_data = {}
     for report in reports:
         report_data[report.indicator.id] = {
             'plan_2022_2023': report.plan_2022_2023,
             'comment': report.comment,
+            # Добавьте другие поля, если нужно
         }
+
+    # Фильтруем статьи по году (например, 2023-2024)
+    articles = Article.objects.filter(
+        teacher=request.user,
+        deadline__year=2023  # Здесь можно изменить на нужный год
+    )
 
     if request.method == 'POST':
         # Проходим по каждому индикатору и сохраняем данные
@@ -166,7 +292,8 @@ def teacher_report_23(request, user_id):
         'main_indicators': main_indicators,
         'sum': sum_indicators,  # Добавляем суммарные индикаторы
         'report_data': reports,  # Передаем существующие данные отчета
-        'direction': direction
+        'direction': direction,
+        'articles': articles  # Передаем отфильтрованные статьи для отображения
     }
     return render(request, 'main/plan-22/23.html', context)
 
@@ -178,6 +305,7 @@ def teacher_report_25(request, user_id):
     reports = TeacherReport.objects.filter(teacher=request.user)
     sum_indicators = IndicatorSum.objects.filter(teacher=request.user)
     direction = Direction.objects.filter(mainindicator__in=main_indicators).distinct()
+
     # Создаем словарь для хранения отчетов по индикаторам
     report_data = {}
     for report in reports:
@@ -185,6 +313,12 @@ def teacher_report_25(request, user_id):
             'plan_2024_2025': report.plan_2024_2025,
             'comment': report.comment,
         }
+
+    # Фильтруем статьи по году (например, 2024-2025)
+    articles = Article.objects.filter(
+        teacher=request.user,
+        deadline__year=2024  # Здесь можно изменить на нужный год
+    )
 
     if request.method == 'POST':
         # Проходим по каждому индикатору и сохраняем данные
@@ -210,9 +344,11 @@ def teacher_report_25(request, user_id):
         'main_indicators': main_indicators,
         'sum': sum_indicators,  # Добавляем суммарные индикаторы
         'report_data': reports,  # Передаем существующие данные отчета
-        'direction': direction
+        'direction': direction,
+        'articles': articles  # Передаем отфильтрованные статьи для отображения
     }
     return render(request, 'main/plan-22/25.html', context)
+
 
 
 #=========================Summa Indicators============================
@@ -276,7 +412,7 @@ def update_admin_reports(request):
     AdminReport.aggregate_reports()
     return redirect('admin_report')
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 
 
 @login_required

@@ -22,6 +22,12 @@ urlpatterns = [
 
     path('teacher-report-summary/<int:user_id>/', views.teacher_report_summary, name='teacher-report-summary'),
 
+    path('indicator/<int:indicator_id>/articles/', views.indicator_articles, name='indicator_articles'),
+    path('indicator/<int:indicator_id>/articles/<int:deadline_year>/', views.indicator_articles,
+         name='indicator_articles_by_year'),
+    path('article/edit/<int:article_id>/', views.edit_article, name='edit_article'),
+    path('article/delete/<int:article_id>/', views.delete_article, name='delete_article'),
+
     # Пути для регистрации, входа и выхода пользователя
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
