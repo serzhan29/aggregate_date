@@ -4,12 +4,16 @@
 
 {% load static %}
 {% block content %}
-  <link rel="stylesheet" href="{% static 'css/teacher_report.css' %}">
-<h2>Отчеты учителя 2022-2023</h2>
+<link rel="stylesheet" href="{% static 'css/teacher_report.css' %}">
+<h3>Отчеты учителя 2022-2023</h3>
 
 <form method="post">
     {% csrf_token %}
-
+    <button type="submit" class="btn-save" style="position: sticky; top: 10px; left: 50%;
+            transform: translateX(-50%); padding: 10px 20px; font-size: 16px; background-color: green;
+            color: white; border: none; border-radius: 5px; z-index: 10;width: 10%;">
+        Сохранить
+    </button>
     <!-- Проходимся по направлениям -->
     {% for dir in direction %}
         <div class="direction-container" style="margin-bottom: 20px;">
@@ -36,7 +40,7 @@
                         <h4>{{ main_indicator.name }}
                             {% for i in sum %}
                                 {% if i.main_indicator.id == main_indicator.id %}
-                                    {{ i.total_plan_2022_2023 }}
+                                    = {{ i.total_plan_2022_2023 }}
                                 {% endif %}
                             {% endfor %}
                         </h4>
@@ -44,13 +48,31 @@
                         <ul>
                             <!-- Отображаем все связанные показатели для текущего главного индикатора -->
                             {% for indicator in main_indicator.indicator_set.all %}
-                                <li>
-                                    <label>{{ indicator.name }}</label>
+                                <li style="display: flex; align-items: center; margin-bottom: 10px;">
+                                    <label style="flex: 1;">{{ indicator.name }}</label>
+                                    {% with articles=indicator.article_set.all %}
+                                        {% if articles.exists %}
+                                            <div class="articles-info">
+                                                {% for article in articles %}
+                                                    {% if article.deadline and article.deadline.year == 2023 %}
+                                                        <input type="text" class="deadline-field" value="Срок до: {{ article.deadline|date:'d.m.Y' }}" readonly />
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
 
-                                    <!-- Извлекаем отчет для текущего показателя -->
+                                    <!-- Поле для ввода данных -->
                                     {% for i in report_data %}
                                         {% if i.indicator.id == indicator.id %}
-                                            <input type="number" name="plan_2022_2023_{{ indicator.id }}" value="{{ i.plan_2022_2023|default:0 }}">
+                                            <input type="number" name="actual_2023_2024_{{ indicator.id }}"
+                                                   value="{{ i.actual_2023_2024|default:0 }}"
+                                                   style="width: 80px; margin-right: 10px;">
+
+                                            <!-- Кнопка "Добавить статьи" -->
+                                            <a href="{% url 'indicator_articles' indicator.id  %}2023" style="white-space: nowrap; margin-right: 15px;">
+                                                Добавить статьи
+                                            </a>
                                         {% endif %}
                                     {% endfor %}
                                 </li>
@@ -61,8 +83,6 @@
             </div>
         </div>
     {% endfor %}
-
-    <button type="submit">Сохранить</button>
 </form>
 
 <!-- Добавляем JS для скрытия/раскрытия блоков -->

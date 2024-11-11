@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Статьи учителя {{ user.first_name }} 2022-2023{% endblock %}
+
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/articles.css' %}">
+
+<div class="articles-container">
+    <h2>Статьи учителя 2022-2023</h2>
+
+    {% if articles %}
+        <table class="articles-table">
+            <thead>
+                <tr>
+                    <th>Название статьи</th>
+                    <th>Главный автор</th>
+                    <th>Соавторы</th>
+                    <th>Срок окончания</th>
+                    <th>Комментарии</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                    <tr>
+                        <td>{{ article.title }}</td>
+                        <td>{{ article.teacher.get_full_name }}</td>
+                        <td>
+                            {% if article.coauthors.all %}
+                                {% for coauthor in article.coauthors.all %}
+                                    {{ coauthor.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <em>Соавторов нет</em>
+                            {% endif %}
+                        </td>
+                        <td>{{ article.deadline|default:"Не указан" }}</td>
+                        <td>{{ article.comments|default:"Нет комментариев" }}</td>
+                        <td>
+                            {% if article.file %}
+                                <a href="{{ article.file.url }}" style="background-color: blue; font-size: 14px;">Скачать файл</a><br>
+                            {% endif %}
+                            <a href="{% url 'edit_article' article.id %}">Редактировать</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Пока нет добавленных статей.</p>
+    {% endif %}
+
+    <hr>
+
+    <h3>Добавить новую статью</h3>
+    <form method="post" enctype="multipart/form-data" class="articles-form">
+        {% csrf_token %}
+        <label for="title">Название статьи:</label>
+        <input type="text" name="title" class="articles-input" required>
+
+        <label for="coauthors">Выберите соавторов:</label>
+        <select name="coauthors" multiple class="articles-input">
+            {% for teacher in teachers %}
+                <option value="{{ teacher.id }}">{{ teacher.get_full_name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="comments">Комментарии:</label>
+        <textarea name="comments" class="articles-textarea" rows="4" cols="50"></textarea>
+
+        <label for="file">Загрузите файл:</label>
+        <input type="file" name="file" class="articles-input">
+
+        <!-- Поле для указания срока окончания -->
+        <label for="deadline">Срок окончания:</label>
+        <input type="date" name="deadline" class="articles-input">
+
+        <button type="submit" class="articles-submit-button">Добавить статью</button>
+    </form>
+</div>
+
+{% endblock %}
