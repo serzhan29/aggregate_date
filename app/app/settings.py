@@ -1,17 +1,11 @@
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-a7ax1t&x706mc=r*p*!yt4pdoe1ophgmn93+p^@#j3_z*!x_oj'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
@@ -63,10 +57,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -79,9 +69,6 @@ DATABASES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -99,9 +86,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
@@ -117,7 +101,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #==================================================================
 AUTH_USER_MODEL = 'main.User'
@@ -125,7 +108,7 @@ AUTH_USER_MODEL = 'main.User'
 LOGIN_REDIRECT_URL = 'teacher_report'
 LOGOUT_REDIRECT_URL = 'login'
 
-# ==========================JAZZMIN=====================
+# ==========================JAZZMIN==============================================================
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "Админка",
@@ -170,7 +153,7 @@ JAZZMIN_SETTINGS = {
     "topmenu_links": [
 
         # Url that gets reversed (Permissions can be added)
-        {"name": "Главная страница",  "url": "teacher_report", "permissions": ["auth.view_user"]},
+        {"name": "Главная страница",  "url": "/teacher-report/1", "permissions": ["auth.view_user"]},
 
         # external url that opens in a new window (Permissions can be added)
         {"name": "Помощь", "url": "https://github.com/serzhan29", "new_window": True},
