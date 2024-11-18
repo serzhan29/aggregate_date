@@ -61,7 +61,7 @@
                                             {% if i.indicator.id == indicator.id %}
                                                 <input type="number" name="actual_2023_2024_{{ indicator.id }}"
                                                        value="{{ i.actual_2023_2024|default:0 }}">
-                                                <a href="{% url 'indicator_articles' indicator.id %}" class="btn-add-articles">
+                                                <a href="{% url 'indicator_articles' indicator.id %}2024" class="btn-add-articles">
                                                     Добавить статьи
                                                 </a>
                                             {% endif %}

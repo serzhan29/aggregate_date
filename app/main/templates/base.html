@@ -15,6 +15,9 @@
             <a href="{% url 'teacher_report' user_id=user.id %}">2023-2024</a>
             <a href="{% url '25' user_id=user.id %}">2024-2025</a>
             <a href="{% url 'teacher-report-summary' user.id %}">Посчитать сумму индикаторов</a>
+            {% if user.is_staff %}
+                <a href="{% url 'admin:index' %}">Админ панель</a>
+            {% endif %}
             <form action="{% url 'logout' %}" method="post" style="display: inline-block;">
                 {% csrf_token %}
                 <button type="submit" class="logout-button">Выход</button>
