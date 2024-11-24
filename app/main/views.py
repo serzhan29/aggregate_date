@@ -79,12 +79,13 @@ def is_admin(user):
 @login_required
 @user_passes_test(is_teacher)
 def teacher_report(request, user_id):
+    # Получение данных из базы
     main_indicators = MainIndicator.objects.prefetch_related('indicator_set').all()
-    reports = TeacherReport.objects.filter(teacher=request.user)
-    direction = Direction.objects.filter(mainindicator__in=main_indicators).distinct()
     sum_indicators = IndicatorSum.objects.filter(teacher=request.user)
+    direction = Direction.objects.filter(mainindicator__in=main_indicators).distinct()
+    reports = TeacherReport.objects.filter(teacher=request.user)
 
-    # Если у учителя нет отчетов, создаем их с нулевыми значениями
+    # Если отчеты для учителя отсутствуют, создаем их с нулевыми значениями
     if not reports:
         for indicator in Indicator.objects.all():
             TeacherReport.objects.create(
@@ -96,36 +97,45 @@ def teacher_report(request, user_id):
                 comment=''
             )
 
+    # Обновляем данные отчетов
     reports = TeacherReport.objects.filter(teacher=request.user)
     report_data = {report.indicator.id: report for report in reports}
 
     if request.method == 'POST':
+        # Сохраняем данные для модели IndicatorSum
+        for indicator_sum in sum_indicators:
+            total_actual_2023_2024 = request.POST.get(f'total_actual_2023_2024_{indicator_sum.id}')
+            if total_actual_2023_2024:
+                indicator_sum.total_actual_2023_2024 = float(total_actual_2023_2024)
+                indicator_sum.save()
+
+        # Сохраняем данные для модели TeacherReport
         for indicator in Indicator.objects.all():
             report, created = TeacherReport.objects.get_or_create(
                 teacher=request.user, indicator=indicator
             )
             actual_2023_2024 = request.POST.get(f'actual_2023_2024_{indicator.id}')
             if actual_2023_2024:
-                report.actual_2023_2024 = actual_2023_2024
+                report.actual_2023_2024 = float(actual_2023_2024)
             report.save()
 
         return redirect('teacher_report', user_id=user_id)
 
-    # Filter articles to only those with start date in 2023 and end date in 2024
+    # Фильтрация статей с дедлайном 2024 года
     articles = Article.objects.filter(
         teacher=request.user,
         deadline__year=2024
     )
 
+    # Формируем контекст для передачи в шаблон
     context = {
         'main_indicators': main_indicators,
         'sum': sum_indicators,
         'report_data': reports,
         'direction': direction,
-        'articles': articles  # Filtered articles for display
+        'articles': articles
     }
     return render(request, 'main/teacher_report.html', context)
-
 
 #++++++++++++++++++++++++++++++++
 """"""
@@ -259,7 +269,6 @@ def teacher_report_23(request, user_id):
         report_data[report.indicator.id] = {
             'plan_2022_2023': report.plan_2022_2023,
             'comment': report.comment,
-            # Добавьте другие поля, если нужно
         }
 
     # Фильтруем статьи по году (например, 2023-2024)
@@ -285,6 +294,13 @@ def teacher_report_23(request, user_id):
                 report.comment = comment
 
             report.save()
+
+        # Обрабатываем изменения для IndicatorSum
+        for sum_indicator in sum_indicators:
+            total_plan_2022_2023 = request.POST.get(f'total_plan_2022_2023_{sum_indicator.id}')
+            if total_plan_2022_2023:
+                sum_indicator.total_plan_2022_2023 = total_plan_2022_2023
+                sum_indicator.save()
 
         return redirect('23', user_id=user_id)
 
@@ -338,6 +354,13 @@ def teacher_report_25(request, user_id):
 
             report.save()
 
+        # Обрабатываем изменения для IndicatorSum
+        for sum_indicator in sum_indicators:
+            total_plan_2024_2025 = request.POST.get(f'total_plan_2024_2025_{sum_indicator.id}')
+            if total_plan_2024_2025:
+                sum_indicator.total_plan_2024_2025 = total_plan_2024_2025
+                sum_indicator.save()
+
         return redirect('25', user_id=user_id)
 
     context = {
@@ -348,6 +371,7 @@ def teacher_report_25(request, user_id):
         'articles': articles  # Передаем отфильтрованные статьи для отображения
     }
     return render(request, 'main/plan-22/25.html', context)
+
 
 
 

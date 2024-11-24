@@ -40,7 +40,8 @@
                         <h4>{{ main_indicator.name }}
                             {% for i in sum %}
                                 {% if i.main_indicator.id == main_indicator.id %}
-                                    = {{ i.total_plan_2022_2023 }}
+                                    <label for="total_plan_2022_2023_{{ i.id }}">Сумма:{{ i.total_plan_2022_2023 }}</label>
+                                    <input type="number" name="total_plan_2022_2023_{{ i.id }}" value="{{ i.total_plan_2022_2023 }}">
                                 {% endif %}
                             {% endfor %}
                         </h4>

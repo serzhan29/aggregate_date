@@ -36,9 +36,16 @@
                             <h4>{{ main_indicator.name }}
                                 {% for i in sum %}
                                     {% if i.main_indicator.id == main_indicator.id %}
-                                        = {{ i.total_actual_2023_2024 }}
+                                        <label for="total_actual_2023_2024_{{ i.id }}">Сумма {{ i.total_actual_2023_2024|default:'0' }}: </label>
+                                        <input
+                                            type="number"
+                                            step="0"
+                                            id="total_actual_2023_2024_{{ i.id }}"
+                                            name="total_actual_2023_2024_{{ i.id }}"
+                                            value="{{ i.total_actual_2023_2024|default_if_none:0 }}">
                                     {% endif %}
                                 {% endfor %}
+
 
                             </h4>
                             <ul>
