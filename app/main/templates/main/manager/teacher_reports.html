@@ -1,0 +1,129 @@
+{% extends 'manager.html' %}
+{% block title %}Отчёт учителя {{ teacher.get_full_name }}{% endblock %}
+
+{% block content %}
+<style>
+    .report-container {
+        max-width: 1400px; /* Увеличиваем контейнер */
+        margin: 30px auto;
+        padding: 30px;
+        background-color: #f9f9f9;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        font-family: 'Arial', sans-serif;
+    }
+
+    h1 {
+        font-size: 30px;
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 30px;
+    }
+
+    .main-indicator {
+        margin-bottom: 30px;
+        padding: 25px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .table th, .table td {
+        padding: 20px 30px; /* Увеличиваем отступы */
+        text-align: center;
+        border: 1px solid #ecf0f1;
+        font-size: 18px; /* Увеличиваем размер шрифта */
+    }
+
+    .table th {
+        background-color: #3498db;
+        color: white;
+        font-weight: normal;
+    }
+
+    .table td {
+        color: #34495e;
+    }
+
+    .table .indicator-name {
+        text-align: left;
+        font-weight: bold;
+        padding-left: 20px;
+    }
+
+    .no-data {
+        color: #95a5a6;
+        text-align: center;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin: 30px auto;
+        text-decoration: none;
+        padding: 14px 30px;
+        background-color: #3498db;
+        color: #ffffff;
+        border-radius: 6px;
+        font-size: 18px;
+        text-align: center;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .back-link:hover {
+        background-color: #2980b9;
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .sum-indicator-cell {
+        font-weight: bold;
+    }
+
+    .no-data {
+        text-align: center;
+    }
+
+</style>
+
+<div class="report-container">
+    <h1>Отчёт учителя {{ teacher.get_full_name }}</h1>
+
+    {% for main_data in data %}
+        <div class="main-indicator">
+            <h3>{{ main_data.main_indicator.name }}</h3>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="indicator-name">Индикатор</th>
+                        <th>2022-2023 <br> Сумма: {{ main_data.sum_indicator.total_plan_2022_2023 }}</th>
+                        <th>2023-2024 <br> Сумма: {{ main_data.sum_indicator.total_actual_2023_2024 }}</th>
+                        <th>2024-2025 <br> Сумма: {{ main_data.sum_indicator.total_plan_2024_2025 }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for indicator_data in main_data.indicators_data %}
+                        <tr>
+                            <td class="indicator-name">{{ indicator_data.indicator.name }}</td>
+                            {% if indicator_data.report %}
+                                <td>{{ indicator_data.report.plan_2022_2023 }}</td>
+                                <td>{{ indicator_data.report.actual_2023_2024 }}</td>
+                                <td>{{ indicator_data.report.plan_2024_2025 }}</td>
+                            {% else %}
+                                <td class="no-data" colspan="3">Нет данных по этому индикатору</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+</div>
+
+<a href="{% url 'teacher_list' %}" class="back-link">Вернуться ко всем отчётам</a>
+{% endblock %}

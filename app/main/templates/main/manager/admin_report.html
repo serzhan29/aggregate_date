@@ -1,3 +1,14 @@
+{% extends 'manager.html' %}
+
+{% block title %}Отчёты учителя{% endblock %}
+
+{% block nav_items %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'teacher_list' %}">Список учителей</a>
+</li>
+{% endblock %}
+
+{% block content %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru">
@@ -45,3 +56,4 @@
 
 </body>
 </html>
+{% endblock %}

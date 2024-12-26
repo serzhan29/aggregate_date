@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
-
 {% block title %}Отчет учителя {{ user.first_name }} 2023-2024{% endblock %}
-
 {% block content %}
 <h3>Отчеты учителя 2023-2024</h3>
 <form  method="post" style="position: relative;">
@@ -11,8 +9,6 @@
             color: white; border: none; border-radius: 5px; z-index: 10;width: 10%;">
         Сохранить
     </button>
-
-
     <!-- Проходимся по направлениям -->
     {% for dir in direction %}
         <div class="direction-container">
@@ -27,7 +23,6 @@
                 Показать/Скрыть
             </button>
         </div>
-
             <!-- Блок с главными индикаторами, скрыт по умолчанию -->
             <div id="main_indicators_{{ dir.id }}" class="main-indicators">
                 {% for main_indicator in main_indicators %}
@@ -45,8 +40,6 @@
                                             value="{{ i.total_actual_2023_2024|default_if_none:0 }}">
                                     {% endif %}
                                 {% endfor %}
-
-
                             </h4>
                             <ul>
                                 {% for indicator in main_indicator.indicator_set.all %}
@@ -82,10 +75,7 @@
             </div>
         </div>
     {% endfor %}
-
-
 </form>
-
 <script>
     function toggleSection(sectionId) {
         var section = document.getElementById(sectionId);

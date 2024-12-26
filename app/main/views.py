@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.contrib import messages
 from django.utils.dateparse import parse_date
-
+from django.db.models import Prefetch
 
 def home(request):
     if not request.user.is_authenticated:
@@ -58,13 +58,11 @@ def user_login(request):
     return render(request, 'main/user/login.html', {'form': form})
 
 
-
 # Выход пользователя
 @login_required
 def user_logout(request):
     logout(request)
     return redirect('login')  # Перенаправляем на страницу входа
-
 
 
 # Проверка, что пользователь - учитель
@@ -139,9 +137,7 @@ def teacher_report(request, user_id):
 
 #++++++++++++++++++++++++++++++++
 """"""
-
 from django.utils.dateparse import parse_date
-
 
 @login_required
 def indicator_articles(request, indicator_id, deadline_year=None):
@@ -374,7 +370,6 @@ def teacher_report_25(request, user_id):
 
 
 
-
 #=========================Summa Indicators============================
 #====================================================================
 def teacher_report_summary(request, user_id):
@@ -426,7 +421,7 @@ def admin_report_view(request):
     context = {
         'admin_reports': admin_reports,
     }
-    return render(request, 'main/admin_report.html', context)
+    return render(request, 'main/manager/admin_report.html', context)
 
 
 # Функция для обновления агрегированных данных для администратора (может быть вызвана вручную)
@@ -466,17 +461,60 @@ def report_details(request, indicator_id):
                 'admin_total_plan_2024_2025': admin_report.total_plan_2024_2025,
             })
 
-        return render(request, 'main/report_details.html', {
+        return render(request, 'main/manager/report_details.html', {
             'teachers': teachers,
             'indicator_name': indicator.name,
             'admin_report': admin_report
         })
 
     except ObjectDoesNotExist as e:
-        return render(request, 'main/report_details.html', {'error': f'Ошибка: {str(e)}'})
+        return render(request, 'main/manager/report_details.html', {'error': f'Ошибка: {str(e)}'})
     except Exception as e:
         print(f"Unexpected Error: {e}")
-        return render(request, 'main/report_details.html', {'error': 'Произошла непредвиденная ошибка'})
+        return render(request, 'main/manager/report_details.html', {'error': 'Произошла непредвиденная ошибка'})
 
 
 
+#============== Teacher report =========
+
+
+def teacher_list(request):
+    """ Отображение списка учителей """
+    teachers = User.objects.filter(role='teacher')  # Фильтруем только учителей
+    return render(request, 'main/manager/teacher_list.html', {'teachers': teachers})
+
+
+def teacher_reports(request, teacher_id):
+    """Отчёт конкретного учителя"""
+    teacher = get_object_or_404(User, id=teacher_id, role='teacher')
+
+    # Предзагрузка связанных данных
+    main_indicators = MainIndicator.objects.prefetch_related(
+        Prefetch('indicator_set', queryset=Indicator.objects.all())
+    ).all()
+    teacher_reports = TeacherReport.objects.filter(teacher=teacher).select_related('indicator')
+    indicator_sums = IndicatorSum.objects.filter(teacher=teacher)
+
+    # Формируем данные для шаблона
+    data = []
+    for main_indicator in main_indicators:
+        related_indicators = main_indicator.indicator_set.all()
+        indicators_data = []
+        for indicator in related_indicators:
+            report = teacher_reports.filter(indicator=indicator).first()
+            indicators_data.append({
+                'indicator': indicator,
+                'report': report,
+            })
+        # Найти соответствующую сумму для главного индикатора
+        sum_indicator = indicator_sums.filter(main_indicator=main_indicator).first()
+        data.append({
+            'main_indicator': main_indicator,
+            'indicators_data': indicators_data,
+            'sum_indicator': sum_indicator
+        })
+
+    return render(request, 'main/manager/teacher_reports.html', {
+        'teacher': teacher,
+        'data': data
+    })

@@ -1,3 +1,7 @@
+{% extends 'manager.html' %}
+{% block title %}Отчёт учителя {{ teacher.get_full_name }}{% endblock %}
+
+{% block content %}
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -50,3 +54,4 @@
     <a href="javascript:history.back()" class="back-button">Назад</a>
 </body>
 </html>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'manager.html' %}
+
+{% block title %}Список учителей{% endblock %}
+
+{% block content %}
+<h1>Список учителей</h1>
+<ul class="list-group">
+    {% for teacher in teachers %}
+        <li class="list-group-item">
+            <a href="{% url 'teacher_reports' teacher.id %}">
+                {{ teacher.first_name }} {{ teacher.last_name }} ({{ teacher.username }})
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

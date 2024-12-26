@@ -9,7 +9,7 @@ from import_export.widgets import ForeignKeyWidget
 # Настройка админки для кастомной модели User
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'first_name', 'last_name', 'role')  # Поля для отображения в списке
+    list_display = ('id','username', 'first_name', 'last_name', 'role')  # Поля для отображения в списке
     search_fields = ('username', 'email')  # Поля для поиска
     list_filter = ('role',)  # Фильтрация по роли
 

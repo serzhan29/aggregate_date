@@ -119,29 +119,20 @@ LOGOUT_REDIRECT_URL = 'login'
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "Админка",
-
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_header": "Админ панель",
-
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "Админка",
-
     # Logo to use for your site, must be present in static files, used for brand on top left
     "site_logo": "/img/logo.jpg",
-
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
     "login_logo": None,
-
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
-
-
     # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
     "site_icon": None,
-
     # Welcome text on the login screen
     "welcome_sign": "Добро пожаловать в админ панель",
-
     # Copyright on the footer
     "copyright": "Тулепбек Сержан",
 
@@ -155,19 +146,14 @@ JAZZMIN_SETTINGS = {
     ############
     # Top Menu #
     ############
-
     # Links to put along the top menu
     "topmenu_links": [
-
         # Url that gets reversed (Permissions can be added)
         {"name": "Главная страница",  "url": "/teacher-report/1", "permissions": ["auth.view_user"]},
-
         # external url that opens in a new window (Permissions can be added)
         {"name": "Помощь", "url": "https://github.com/serzhan29", "new_window": True},
-
         # model admin to link to (Permissions checked against model)
         {"model": "auth.User"},
-
         # App with dropdown menu to all its models pages (Permissions checked against models)
         {"app": "books"},
     ],
@@ -253,6 +239,29 @@ JAZZMIN_SETTINGS = {
     "changeform_format_overrides": {"auth.user": "collapsible", "auth.group": "vertical_tabs"},
     # Add a language dropdown into the admin
 
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'main': {  # Убедитесь, что это имя вашего приложения
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
 }
 
 
