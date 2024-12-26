@@ -10,6 +10,8 @@ from django.db.models import Q
 from django.contrib import messages
 from django.utils.dateparse import parse_date
 from django.db.models import Prefetch
+from django.http import Http404
+
 
 def home(request):
     if not request.user.is_authenticated:
@@ -518,3 +520,37 @@ def teacher_reports(request, teacher_id):
         'teacher': teacher,
         'data': data
     })
+
+
+def articles_by_indicator(request, indicator_id, teacher_id):
+    try:
+        # Получаем индикатор по его ID
+        indicator = get_object_or_404(Indicator, id=indicator_id)
+
+        # Получаем учителя по ID
+        teacher = get_object_or_404(User, id=teacher_id)
+
+        # Фильтруем статьи, связанные с индикатором и учителем
+        articles = Article.objects.filter(indicator=indicator, teacher=teacher)
+
+        # Если передан параметр для фильтрации по году окончания
+        deadline_year = request.GET.get('deadline_year')  # Получаем год из параметров URL
+
+        if deadline_year:
+            # Фильтруем статьи по году окончания (deadline_year)
+            articles = articles.filter(deadline__year=deadline_year)
+
+        # Передаем в шаблон индикатор, учителя, статьи и выбранный год
+        context = {
+            'indicator': indicator,
+            'teacher': teacher,
+            'articles': articles,
+            'selected_year': deadline_year  # Передаем выбранный год для отображения в шаблоне
+        }
+
+        return render(request, 'main/manager/views_articles.html', context)
+
+    except Indicator.DoesNotExist:
+        raise Http404("Индикатор не найден")
+    except User.DoesNotExist:
+        raise Http404("Учитель не найден")

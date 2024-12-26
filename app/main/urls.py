@@ -31,6 +31,9 @@ urlpatterns = [
     path('teachers/', views.teacher_list, name='teacher_list'),
     path('teachers/<int:teacher_id>/', views.teacher_reports, name='teacher_reports'),
 
+    path('indicator/<int:indicator_id>/teacher/<int:teacher_id>/', views.articles_by_indicator,
+         name='articles_by_indicator'),
+
     # Пути для регистрации, входа и выхода пользователя
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),

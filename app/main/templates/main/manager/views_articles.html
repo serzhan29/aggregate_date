@@ -1,0 +1,211 @@
+{% extends 'manager.html' %}
+
+{% block title %}Статьи по индикатору {{ indicator.name }}{% endblock %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/articles.css' %}">
+
+<style>
+    .indicator-articles-container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Arial', sans-serif;
+    }
+
+    .indicator-articles-header {
+        font-size: 32px;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .year-filter {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .year-filter a {
+        padding: 15px 30px; /* Увеличено пространство для кнопок */
+        margin: 0 15px;
+        text-decoration: none;
+        background-color: #3498db;
+        color: white;
+        border-radius: 5px;
+        font-size: 20px; /* Увеличен размер шрифта */
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+    .year-filter a:hover {
+        background-color: #2980b9;
+    }
+
+    .indicator-articles-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .indicator-articles-table th,
+    .indicator-articles-table td {
+        padding: 15px;
+        text-align: left;
+        border: 1px solid #ecf0f1;
+        font-size: 16px;
+        color: #34495e;
+    }
+
+    .indicator-articles-table th {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .indicator-articles-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .indicator-articles-table tr:hover {
+        background-color: #dfe6e9;
+    }
+
+    .indicator-articles-table td em {
+        color: #95a5a6;
+    }
+
+    /* Увеличение полей для дат */
+    .indicator-articles-table td.date-field {
+        font-size: 18px; /* Увеличен размер шрифта */
+        padding: 20px 30px; /* Увеличены отступы для удобства */
+    }
+
+    .indicator-articles-form {
+        margin-top: 40px;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .indicator-articles-form label {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 16px;
+        color: #2c3e50;
+    }
+
+    .indicator-articles-form input,
+    .indicator-articles-form select,
+    .indicator-articles-form textarea {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 6px;
+        border: 1px solid #ecf0f1;
+        font-size: 16px;
+        color: #34495e;
+    }
+
+    .indicator-articles-form button {
+        padding: 12px 20px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .indicator-articles-form button:hover {
+        background-color: #2980b9;
+    }
+
+    .back-button {
+        padding: 10px 20px;
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+        display: inline-block;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+        background-color: #c0392b;
+    }
+
+</style>
+
+<div class="indicator-articles-container">
+    <h2 class="indicator-articles-header">Статьи по индикатору: {{ indicator.name }}</h2>
+
+    <!-- Ссылки для фильтрации по годам -->
+    <div class="year-filter">
+        <a href="{% url 'articles_by_indicator' indicator_id=indicator.id teacher_id=teacher.id %}">Все года</a>
+        <a href="{% url 'articles_by_indicator' indicator_id=indicator.id teacher_id=teacher.id %}?deadline_year=2023">2023</a>
+        <a href="{% url 'articles_by_indicator' indicator_id=indicator.id teacher_id=teacher.id %}?deadline_year=2024">2024</a>
+        <a href="{% url 'articles_by_indicator' indicator_id=indicator.id teacher_id=teacher.id %}?deadline_year=2025">2025</a>
+    </div>
+
+    {% if articles %}
+        <h3>Статьи с окончанием в {{ selected_year|default:"все годы" }}</h3>
+        <table class="indicator-articles-table">
+            <thead>
+                <tr>
+                    <th>Название статьи</th>
+                    <th>Главный автор</th>
+                    <th>Соавторы</th>
+                    <th>Дата начала</th>
+                    <th>Срок окончания</th>
+                    <th>Комментарии</th>
+                    <th>Файл</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                    <tr>
+                        <td>{{ article.title }}</td>
+                        <td>{{ article.teacher.get_full_name }}</td>
+                        <td>
+                            {% if article.coauthors.all %}
+                                {% for coauthor in article.coauthors.all %}
+                                    {{ coauthor.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <em>Соавторов нет</em>
+                            {% endif %}
+                        </td>
+                        <td class="date-field">{{ article.start|default:"Не указана" }}</td>
+                        <td class="date-field">{{ article.deadline|default:"Не указан" }}</td>
+                        <td>{{ article.comments|default:"Нет комментариев" }}</td>
+                        <td>
+                            {% if article.file %}
+                                <a href="{{ article.file.url }}" class="file-link">Скачать файл</a>
+                            {% else %}
+                                <em>Нет файла</em>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Пока нет добавленных статей для выбранного года.</p>
+    {% endif %}
+
+    <!-- Кнопка для возврата на страницу отчётов учителя -->
+    <a href="{% url 'teacher_reports' teacher_id=teacher.id %}">
+        <button class="back-button">Назад</button>
+    </a>
+
+</div>
+{% endblock %}

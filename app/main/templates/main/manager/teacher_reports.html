@@ -109,7 +109,12 @@
                 <tbody>
                     {% for indicator_data in main_data.indicators_data %}
                         <tr>
-                            <td class="indicator-name">{{ indicator_data.indicator.name }}</td>
+                           <td class="indicator-name">
+                                <a href="{% url 'articles_by_indicator' indicator_data.indicator.id teacher.id %}">
+                                    {{ indicator_data.indicator.name }}
+                                </a>
+                            </td>
+
                             {% if indicator_data.report %}
                                 <td>{{ indicator_data.report.plan_2022_2023 }}</td>
                                 <td>{{ indicator_data.report.actual_2023_2024 }}</td>
