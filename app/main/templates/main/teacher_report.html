@@ -1,76 +1,89 @@
 {% extends 'base.html' %}
-
 {% block title %}Отчет учителя {{ user.first_name }} 2023-2024{% endblock %}
-
 {% block content %}
-<h2>Отчеты учителя 2023-2024</h2>
-<form method="post">
+<h3>Отчеты учителя 2023-2024</h3>
+<form  method="post" style="position: relative;">
     {% csrf_token %}
-
+    <button type="submit" class="btn-save" style="position: sticky; top: 10px; left: 50%;
+            transform: translateX(-50%); padding: 10px 20px; font-size: 16px; background-color: green;
+            color: white; border: none; border-radius: 5px; z-index: 10;width: 10%;">
+        Сохранить
+    </button>
     <!-- Проходимся по направлениям -->
     {% for dir in direction %}
-        <div class="direction-container" style="margin-bottom: 20px;">
-            <h3 style="display: inline-block;">
-                {{ dir.name }}
-            </h3>
-
-            <!-- Кнопка для раскрытия/скрытия главных индикаторов -->
+        <div class="direction-container">
+            <h3 style="display: inline-block; margin-right: 10px;">{{ dir.name }}</h3>
             <button type="button" class="toggle-button" onclick="toggleSection('main_indicators_{{ dir.id }}')"
-                style="display: inline-block; margin-left: 10px; padding: 5px 10px; font-size: 18px;
-                cursor: pointer; border: none;
-                background-color: lawngreen;
-                color: black;
-                border-radius: 5px;
-                width: 10%">
-                +/-
+                    style="display: inline-block; padding: 5px 10px; font-size: 18px;
+                    cursor: pointer; border: none;
+                    background-color: lawngreen;
+                    color: black;
+                    border-radius: 5px;
+                    width: 10%">
+                Показать/Скрыть
             </button>
-
+        </div>
             <!-- Блок с главными индикаторами, скрыт по умолчанию -->
-            <div id="main_indicators_{{ dir.id }}" class="main-indicators" style="display: none; margin-top: 10px;">
+            <div id="main_indicators_{{ dir.id }}" class="main-indicators">
                 {% for main_indicator in main_indicators %}
                     {% if main_indicator.direction == dir %}
-                        <h4>{{ main_indicator.name }}
-                            {% for i in sum %}
-                                {% if i.main_indicator.id == main_indicator.id %}
-                                    = {{ i.total_actual_2023_2024 }}
-                                {% endif %}
-                            {% endfor %}
-                        </h4>
+                        <div class="indicator-container">
+                            <h4>{{ main_indicator.name }}
+                                {% for i in sum %}
+                                    {% if i.main_indicator.id == main_indicator.id %}
+                                        <label for="total_actual_2023_2024_{{ i.id }}">Сумма {{ i.total_actual_2023_2024|default:'0' }}: </label>
+                                        <input
+                                            type="number"
+                                            step="0"
+                                            id="total_actual_2023_2024_{{ i.id }}"
+                                            name="total_actual_2023_2024_{{ i.id }}"
+                                            value="{{ i.total_actual_2023_2024|default_if_none:0 }}">
+                                    {% endif %}
+                                {% endfor %}
+                            </h4>
+                            <ul>
+                                {% for indicator in main_indicator.indicator_set.all %}
+                                    <li>
+                                        <label>{{ indicator.name }}</label>
+                                            {% with articles=indicator.article_set.all %}
+                                                {% if articles.exists %}
+                                                    <div class="articles-info">
+                                                        {% for article in articles %}
+                                                            {% if article.deadline and article.deadline.year == 2024 %}
+                                                                <input type="text" class="deadline-field" value=" Срок до: {{ article.deadline|date:'d.m.Y' }}" readonly />
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            {% endwith %}
 
-                        <ul>
-                            <!-- Отображаем все связанные показатели для текущего главного индикатора -->
-                            {% for indicator in main_indicator.indicator_set.all %}
-                                <li>
-                                    <label>{{ indicator.name }}</label>
-
-                                    <!-- Извлекаем отчет для текущего показателя -->
-                                    {% for i in report_data %}
-                                        {% if i.indicator.id == indicator.id %}
-                                            <input type="number" name="actual_2023_2024_{{ indicator.id }}" value="{{ i.actual_2023_2024|default:0 }}">
-                                        {% endif %}
-                                    {% endfor %}
-                                </li>
-                            {% endfor %}
-                        </ul>
+                                        {% for i in report_data %}
+                                            {% if i.indicator.id == indicator.id %}
+                                                <input type="number" name="actual_2023_2024_{{ indicator.id }}"
+                                                       value="{{ i.actual_2023_2024|default:0 }}">
+                                                <a href="{% url 'indicator_articles' indicator.id %}2024" class="btn-add-articles">
+                                                    Добавить статьи
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     {% endif %}
                 {% endfor %}
             </div>
         </div>
     {% endfor %}
-
-    <button type="submit">Сохранить</button>
 </form>
-
-<!-- Добавляем JS для скрытия/раскрытия блоков -->
 <script>
     function toggleSection(sectionId) {
         var section = document.getElementById(sectionId);
-        if (section.style.display === "none") {
+        if (section.style.display === "none" || section.style.display === "") {
             section.style.display = "block";
         } else {
             section.style.display = "none";
         }
     }
 </script>
-
 {% endblock %}

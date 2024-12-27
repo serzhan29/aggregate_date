@@ -1,0 +1,160 @@
+    /* Уникальные стили для страницы статей по индикатору */
+    .indicator-articles-container {
+        max-width: 800px; /* Максимальная ширина контейнера */
+        margin: 0 auto; /* Центрирование контейнера */
+        padding: 20px; /* Отступы внутри контейнера */
+        background-color: #f9f9f9; /* Светлый фон */
+        border: 1px solid #ddd; /* Светлая рамка */
+        border-radius: 8px; /* Закругленные углы */
+    }
+
+    .indicator-articles-header {
+        text-align: center; /* Выравнивание заголовка по центру */
+        margin-bottom: 20px; /* Отступ снизу */
+    }
+
+    .indicator-articles-list {
+        list-style-type: none; /* Убираем маркеры списка */
+        padding: 0; /* Убираем отступы списка */
+    }
+
+    .indicator-article-item {
+        padding: 15px; /* Отступы внутри каждого элемента списка */
+        border: 1px solid #ddd; /* Рамка вокруг элемента */
+        margin-bottom: 10px; /* Отступ снизу между элементами */
+        border-radius: 5px; /* Закругленные углы для элементов списка */
+        background-color: #fff; /* Белый фон для элементов списка */
+    }
+
+    .indicator-article-item strong {
+        color: #333; /* Цвет для заголовков статей */
+    }
+
+    .indicator-article-authors {
+        color: #555; /* Цвет для текста соавторов */
+    }
+
+    .indicator-article-edit-link {
+        display: inline-block; /* Отображаем как блочный элемент */
+        margin-top: 10px; /* Отступ сверху для ссылки на редактирование */
+        color: white; /* Цвет ссылки */
+        text-decoration: none; /* Убираем подчеркивание */
+    }
+
+    .indicator-article-edit-link:hover {
+        text-decoration: underline; /* Подчеркивание при наведении */
+    }
+
+    .indicator-articles-form {
+        margin-top: 30px; /* Отступ сверху для формы */
+        padding: 20px; /* Отступы внутри формы */
+        border: 1px solid #ddd; /* Рамка вокруг формы */
+        border-radius: 8px; /* Закругленные углы для формы */
+        background-color: #f1f1f1; /* Светлый фон для формы */
+    }
+
+    .indicator-articles-form label {
+        display: block; /* Отображаем метки как блочные элементы */
+        margin-bottom: 5px; /* Отступ снизу для меток */
+    }
+
+    /* Стили для полей ввода данных */
+    .indicator-input,
+    .indicator-textarea,
+    .indicator-submit-button {
+        width: 100%; /* Полная ширина */
+        padding: 10px; /* Отступы внутри поля */
+        margin-bottom: 15px; /* Отступ снизу */
+        border: 1px solid #ccc; /* Рамка */
+        border-radius: 5px; /* Закругленные углы */
+        font-size: 16px; /* Размер шрифта */
+        box-sizing: border-box; /* Учитываем рамку и отступы в ширину */
+    }
+
+    /* Стили для кнопки отправки */
+    .indicator-submit-button {
+        background-color: #4CAF50; /* Зеленый цвет фона */
+        color: white; /* Цвет текста */
+        border: none; /* Без рамки */
+        cursor: pointer; /* Указатель мыши */
+        transition: background-color 0.3s; /* Плавный переход цвета фона */
+    }
+
+    .indicator-submit-button:hover {
+        background-color: #45a049; /* Темнее при наведении */
+    }
+
+    /* Стили для текстовой области комментариев */
+    .indicator-textarea {
+        resize: vertical; /* Возможность изменения размера только по вертикали */
+    }
+        /* Основные стили */
+    .indicator-articles-container {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .indicator-articles-header {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+    }
+
+    /* Стили таблицы */
+    .indicator-articles-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    .indicator-articles-table th,
+    .indicator-articles-table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .indicator-articles-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    .indicator-article-actions a {
+        display: inline-block;
+        margin-top: 5px;
+    }
+
+    /* Стили формы */
+    .indicator-articles-form label {
+        display: block;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    .indicator-articles-form input,
+    .indicator-articles-form select,
+    .indicator-articles-form textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .indicator-submit-button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .indicator-submit-button:hover {
+        background-color: #45a049;
+    }

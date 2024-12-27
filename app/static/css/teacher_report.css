@@ -5,60 +5,100 @@ body {
     padding: 0;
     background-color: #f4f4f4;
     color: #333;
-
 }
 
-h1, h3 {
+h3 {
     text-align: center;
     margin-bottom: 20px;
     color: #333;
 }
-
-form {
-    background-color: #fff;
-    padding: 20px;
-    margin: 20px auto;
-    max-width: 90%;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: white;
 }
 
-ul {
-    list-style: none;
-    padding: 0;
+/* Убедитесь, что все элементы на одной линии */
+li {
+    display: flex;
+    justify-content: flex-end; /* выравнивание по правому краю */
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: #ecf0f1;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 15px 0;
     margin-bottom: 20px;
 }
 
-li {
-    display: flex;
-    align-items: center; /* Выравнивание по вертикали */
-    justify-content: space-between; /* Разделение метки и поля ввода */
-    margin-bottom: 15px;
-    padding: 8px 0;
-    border-bottom: 1px solid #ddd; /* Разделитель между элементами */
+header h1 {
+    margin: 0;
+    font-size: 24px;
+    text-align: center;
 }
 
-label {
+nav {
+    text-align: center;
+    margin-top: 0px;
+}
+
+nav a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 30px;
+    text-decoration: none;
     font-size: 16px;
-    color: #555;
+    transition: all 0.3s ease;
+    margin: 0 10px;
 }
 
-input[type="number"] {
-    width: 150px; /* Фиксированная ширина для полей */
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+nav a:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+nav form {
+    display: inline-block;
+    padding: 0;
+    background-color: transparent;
+}
+
+.logout-button {
+    background-color: #dc3545;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
     font-size: 16px;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    margin-top: 10px;
 }
 
-input[type="number"]:focus {
-    border-color: #007bff; /* Цвет рамки при фокусе */
+.logout-button:hover {
+    background-color: #c82333;
 }
 
-/* Кнопка сохранения */
-button {
+/* Стиль для формы */
+form {
+    background-color: #fff;
+    padding: 5px;
+    margin: 10px auto;
+    max-width: 90%;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Кнопка "Сохранить" */
+.submit-button {
     background-color: #007bff;
     color: #fff;
     border: none;
@@ -68,69 +108,198 @@ button {
     font-size: 16px;
     transition: background-color 0.3s ease;
     margin-top: 20px;
-    width: 100%; /* Ширина кнопки 100% для мобильных */
+    width: auto; /* Убираем растягивание на весь экран */
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
 }
 
-button:hover {
+.submit-button:hover {
     background-color: #0056b3;
 }
 
-/* Улучшенный стиль для ссылки */
+/* Стили для ссылок */
 a {
     display: inline-block;
     padding: 12px 25px;
-    background-color: #28a745; /* Зеленый цвет для фона */
-    color: #fff; /* Белый цвет текста */
-    border-radius: 30px; /* Закругленные углы для более "мягкого" дизайна */
-    text-decoration: none; /* Убираем подчеркивание */
+    background-color: #28a745;
+    color: #fff;
+    border-radius: 30px;
+    text-decoration: none;
     font-size: 16px;
     font-weight: bold;
-    transition: all 0.3s ease; /* Плавный переход для всех свойств */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Легкая тень для объема */
-    text-align: center; /* Центрируем текст ссылки */
-    margin: 10px auto; /* Центрирование ссылки */
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin: 10px auto;
 }
 
-/* Стили для ссылок при наведении */
 a:hover {
-    background-color: #218838; /* Более темный зеленый при наведении */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Увеличение тени при наведении */
-    transform: translateY(-2px); /* Легкое поднятие ссылки */
+    background-color: #218838;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
 }
 
-/* Центрирование ссылок в контейнере */
-.container {
-    text-align: center; /* Центрируем текст ссылок */
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: #ecf0f1;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    font-size: 16px;
+    color: black;
+    flex: 1;
+}
+
+/* Стили для полей ввода */
+input[type="number"] {
+    width: 120px;  /* фиксированная ширина */
+    padding: 8px 12px;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    text-align: right; /* выравнивание текста по правому краю */
+}
+
+/* При фокусе на поле ввода */
+input[type="number"]:focus {
+    border-color: #3498db;
+}
+
+button {
+    display: block;
+    background-color: #3498db;
+    color: #fff;
+    padding: 12px 25px;
+    font-size: 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 30px auto;
+    width: 100%;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.toggle-button {
+    background-color: #f39c12;
+    color: #fff;
+    padding: 6px 12px;
+    font-size: 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.toggle-button span {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.toggle-button:hover {
+    background-color: #e67e22;
+}
+
+.main-indicators {
+    margin-top: 20px;
+    display: none;
+}
+
+.btn-add-articles {
+    display: inline-block;
+    background-color: #2ecc71;
+    color: #fff;
+    padding: 15px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    margin-left: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-add-articles:hover {
+    background-color: #27ae60;
+}
+
+.articles-info {
+    margin-left: 20px;
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+.articles-info span {
+    display: block;
 }
 
 /* Мобильная адаптация */
 @media (max-width: 768px) {
-    li {
-        flex-direction: column; /* На мобильных устройствах элементы располагаются вертикально */
-        align-items: flex-start; /* Выравнивание по левому краю */
-        margin-bottom: 10px; /* Уменьшение отступа между элементами */
+    form {
+        padding: 20px;
+        max-width: 100%;
     }
 
-    label {
-        margin-bottom: 5px; /* Отступ для метки на мобильных */
+    li {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     input[type="number"] {
-        width: 100%; /* Поля ввода занимают всю ширину */
-        margin-top: 5px; /* Отступ сверху для полей ввода */
+        width: 100%;
+        margin-top: 10px;
     }
 
     button {
-        padding: 12px; /* Увеличиваем отступы на мобильных */
-        font-size: 14px; /* Уменьшение шрифта на мобильных */
-        margin-top: 15px; /* Отступ сверху для кнопки */
+        padding: 15px;
+        font-size: 16px;
     }
 
-    /* Стили для ссылок на мобильных */
-    a {
-        width: auto; /* Ширина ссылки на мобильных */
-        padding: 12px; /* Увеличиваем отступы */
-        font-size: 14px; /* Уменьшение шрифта на мобильных */
-        margin: 10px auto; /* Центрирование ссылки */
+    .toggle-button {
+        padding: 8px 16px;
+        font-size: 20px;
+    }
+
+    .btn-add-articles {
+        font-size: 14px;
+        padding: 8px 18px;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+
+    h4 {
+        font-size: 16px;
     }
 }
+.articles-info {
+    display: flex;
+    flex-direction: column; /* Это разместит элементы друг под другом */
+    gap: 10px; /* Отступы между элементами */
+}
+
+.deadline-field {
+    background-color: #f4f4f4;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 15px;
+    width: auto; /* Можно задать фиксированную ширину, если нужно */
+}
+

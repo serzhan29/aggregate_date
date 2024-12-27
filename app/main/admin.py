@@ -1,17 +1,24 @@
 from django.contrib import admin
 from import_export import resources, fields
 from import_export.admin import ExportActionModelAdmin
-from .models import User, Indicator, TeacherReport, AdminReport, MainIndicator, IndicatorSum, Direction
+from .models import (User, Indicator, TeacherReport, AdminReport, MainIndicator, IndicatorSum,
+                     Direction, Coauthor, CoauthorScore, Article)
 from import_export.formats.base_formats import XLSX
 from import_export.widgets import ForeignKeyWidget
-
 
 # Настройка админки для кастомной модели User
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'role')  # Поля, которые будут отображаться в списке
-    search_fields = ('username', 'email')  # Поля, по которым можно искать
-    list_filter = ('role',)  # Фильтрация по полям
+    list_display = ('id','username', 'first_name', 'last_name', 'role')  # Поля для отображения в списке
+    list_display_links = ('id', 'username', )
+    search_fields = ('username', 'email')  # Поля для поиска
+    list_filter = ('role',)  # Фильтрация по роли
+
+    # Если поле role - это свойство или метод, добавьте его так:
+    def role(self, obj):
+        return obj.get_role_display()  # Например, если role - это выбор из списка
+    role.admin_order_field = 'role'  # Это позволит сортировать по этому полю
+    role.short_description = 'Роль'
 
 # Настройка админки для модели Indicator
 @admin.register(Indicator)
@@ -99,3 +106,15 @@ class AdminIndicatorSum(ExportActionModelAdmin):
 
 admin.site.register(MainIndicator)
 admin.site.register(Direction)
+
+@admin.register(Article)
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ('title', 'indicator', 'teacher', 'get_coauthors', 'created_at', 'start', 'deadline')
+    list_display_links = ('title', 'indicator', 'teacher')  # Можно оставить ссылки только на важные поля
+    search_fields = ('title', 'indicator__name', 'teacher__username')  # Поиск по названию статьи, индикатору и имени пользователя преподавателя
+    list_filter = ('indicator', 'teacher', 'coauthors', 'created_at', 'start', 'deadline')  # Фильтры для административной панели
+
+    # Метод для отображения coauthors в админке
+    def get_coauthors(self, obj):
+        return ", ".join([str(coauthor) for coauthor in obj.coauthors.all()])
+    get_coauthors.short_description = 'Соавторы'  # Название столбца в админке

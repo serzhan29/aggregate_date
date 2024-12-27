@@ -1,17 +1,11 @@
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-a7ax1t&x706mc=r*p*!yt4pdoe1ophgmn93+p^@#j3_z*!x_oj'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
@@ -29,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "debug_toolbar",
     'import_export',
     'main',
 ]
@@ -41,6 +36,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'app.urls'
@@ -63,10 +59,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -79,9 +71,6 @@ DATABASES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -99,9 +88,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
@@ -113,7 +99,14 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #==================================================================
@@ -122,33 +115,24 @@ AUTH_USER_MODEL = 'main.User'
 LOGIN_REDIRECT_URL = 'teacher_report'
 LOGOUT_REDIRECT_URL = 'login'
 
-# ==========================JAZZMIN=====================
+# ==========================JAZZMIN==============================================================
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "Админка",
-
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_header": "Админ панель",
-
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "Админка",
-
     # Logo to use for your site, must be present in static files, used for brand on top left
     "site_logo": "/img/logo.jpg",
-
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
     "login_logo": None,
-
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
-
-
     # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
     "site_icon": None,
-
     # Welcome text on the login screen
     "welcome_sign": "Добро пожаловать в админ панель",
-
     # Copyright on the footer
     "copyright": "Тулепбек Сержан",
 
@@ -162,19 +146,14 @@ JAZZMIN_SETTINGS = {
     ############
     # Top Menu #
     ############
-
     # Links to put along the top menu
     "topmenu_links": [
-
         # Url that gets reversed (Permissions can be added)
-        {"name": "Главная страница",  "url": "teacher_report", "permissions": ["auth.view_user"]},
-
+        {"name": "Главная страница",  "url": "/teacher-report/1", "permissions": ["auth.view_user"]},
         # external url that opens in a new window (Permissions can be added)
         {"name": "Помощь", "url": "https://github.com/serzhan29", "new_window": True},
-
         # model admin to link to (Permissions checked against model)
         {"model": "auth.User"},
-
         # App with dropdown menu to all its models pages (Permissions checked against models)
         {"app": "books"},
     ],
@@ -260,6 +239,29 @@ JAZZMIN_SETTINGS = {
     "changeform_format_overrides": {"auth.user": "collapsible", "auth.group": "vertical_tabs"},
     # Add a language dropdown into the admin
 
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'main': {  # Убедитесь, что это имя вашего приложения
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
 }
 
 

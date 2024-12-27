@@ -1,0 +1,206 @@
+/* Основные стили формы редактирования */
+.edit-article-form {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.edit-article-form h2 {
+    font-size: 26px;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.edit-article-form label {
+    display: block;
+    font-weight: 600;
+    margin: 10px 0 5px;
+    color: #555;
+}
+
+.edit-article-form input[type="text"],
+.edit-article-form input[type="date"],
+.edit-article-form select,
+.edit-article-form textarea,
+.edit-article-form input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    transition: border-color 0.3s ease;
+}
+
+.edit-article-form input[type="text"]:focus,
+.edit-article-form input[type="date"]:focus,
+.edit-article-form select:focus,
+.edit-article-form textarea:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+/* Стили ссылки на файл */
+.file-link {
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+.file-link:hover {
+    text-decoration: underline;
+}
+
+/* Кнопки (сохранить, отменить, удалить) */
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.submit-btn, .cancel-btn, .delete-btn {
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    width: 30%;
+}
+
+.submit-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #45a049;
+}
+
+.cancel-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.cancel-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+.delete-form {
+    display: inline;
+}
+/* Уникальные стили для кнопки */
+.unique-btn {
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: #3498db; /* Синий цвет фона */
+    color: #fff;
+    border: 2px solid #2980b9; /* Темно-синий цвет для рамки */
+    border-radius: 50px; /* Скругленные углы */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    display: inline-block;
+    margin-right: 10px; /* Добавляем отступ между кнопками */
+}
+
+.unique-btn:hover {
+    background-color: #2980b9; /* Темно-синий при наведении */
+    border-color: #3498db; /* Меняется цвет рамки */
+    transform: translateY(-3px); /* Легкое поднятие кнопки при наведении */
+}
+
+.unique-btn:active {
+    background-color: #1f5987; /* Еще более темный оттенок синего при клике */
+    border-color: #1c4f6f;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transform: translateY(2px); /* При нажатии кнопка слегка опускается */
+}
+
+.unique-btn:focus {
+    outline: none; /* Убираем стандартную рамку при фокусе */
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.5); /* Синяя обводка при фокусе */
+}
+
+.unique-btn:disabled {
+    background-color: #d5d5d5; /* Светло-серый цвет для неактивной кнопки */
+    border-color: #b3b3b3;
+    color: #aaa;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Если кнопки должны располагаться на одной строке с интервалом */
+.button-container {
+    display: flex;
+    justify-content: flex-start; /* Расположение кнопок слева */
+    gap: 15px; /* Пространство между кнопками */
+}
+
+/* Стиль кнопки "Отмена" */
+.btn-cancel {
+    display: inline-block;
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: #e74c3c; /* Красный цвет фона */
+    color: #fff;
+    border: 2px solid #c0392b; /* Темно-красная рамка */
+    border-radius: 50px; /* Скругленные углы */
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-decoration: none; /* Убираем подчеркивание */
+}
+
+/* Эффект при наведении */
+.btn-cancel:hover {
+    background-color: #c0392b; /* Темно-красный цвет фона при наведении */
+    transform: translateY(-2px); /* Легкий подъем кнопки */
+}
+
+/* Эффект при нажатии */
+.btn-cancel:active {
+    transform: translateY(1px); /* Опускание кнопки при нажатии */
+}
+
+
+/* Медиазапросы для адаптивности */
+@media (max-width: 768px) {
+    .edit-article-form {
+        padding: 20px;
+    }
+
+    .form-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .submit-btn, .cancel-btn, .delete-btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

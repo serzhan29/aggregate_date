@@ -5,7 +5,6 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
 
-
 class User(AbstractUser):
     """Пользователи"""
     # Поле для роли пользователя (учитель или администратор)
@@ -46,6 +45,7 @@ class User(AbstractUser):
 class Direction(models.Model):
     """ Направление (Академическое, Научное и т.д.) """
     name = models.CharField('Название: ', max_length=255)
+    percentage = models.DecimalField('Процент за публикации', max_digits=5, decimal_places=2, blank=True, null=True)
 
 
     def __str__(self):
@@ -64,6 +64,7 @@ class MainIndicator(models.Model):
     amount_2022_2023 = models.IntegerField('Суммарный план 2022-2023: ', default=0)
     amount_2023_2024 = models.IntegerField('Суммарные выполненные показатели 2023-2024', default=0)
     amount_2024_2025 = models.IntegerField('Суммарный план на 2024-2025', default=0)
+    score = models.DecimalField('Базовый балл', max_digits=5, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -79,7 +80,7 @@ class Indicator(models.Model):
     main_name = models.ForeignKey(MainIndicator, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField('Название индикатора: ', max_length=255)  # (например, публикации в Scopus)
     unit = models.CharField('Единица измерения:', max_length=50)  # (счет, проценты и т.д.)
-
+    score = models.DecimalField('Баллы', max_digits=5, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -87,6 +88,40 @@ class Indicator(models.Model):
     class Meta:
         verbose_name = 'Индикатор'
         verbose_name_plural = 'Индикаторы'
+
+
+class Coauthor(models.Model):
+    """Связь между учителем, индикатором и соавторами"""
+    indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='authored_indicators')
+    coauthors = models.ManyToManyField(User, related_name='coauthored_indicators', blank=True)
+    final_score = models.DecimalField('Окончательный балл для автора', max_digits=5, decimal_places=2, default=0)
+
+    def calculate_score(self):
+        """Рассчитываем баллы для автора и его соавторов"""
+        direction_percentage = self.indicator.main_indicator.direction.percentage / 100
+        base_score = self.indicator.score * direction_percentage
+        coauthor_count = self.coauthors.count() + 1  # Включаем основного автора
+        score_per_author = base_score / coauthor_count
+
+        # Устанавливаем баллы автору и соавторам
+        self.final_score = score_per_author
+        self.save()
+        for coauthor in self.coauthors.all():
+            CoauthorScore.objects.update_or_create(
+                user=coauthor,
+                coauthor_entry=self,
+                defaults={'score': score_per_author}
+            )
+
+class CoauthorScore(models.Model):
+    """Баллы соавторов для конкретного индикатора"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    coauthor_entry = models.ForeignKey(Coauthor, on_delete=models.CASCADE, related_name='coauthor_scores')
+    score = models.DecimalField('Баллы', max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.user} - {self.score} баллов"
 
 
 # Модель для хранения отчетов учителей
@@ -112,6 +147,23 @@ class TeacherReport(models.Model):
     class Meta:
         verbose_name = 'Отчёт учителя'
         verbose_name_plural = 'Отчёты учителей'
+
+
+class Article(models.Model):
+    title = models.CharField(max_length=255)
+    indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE)
+    coauthors = models.ManyToManyField(User, related_name='coauthored_articles', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    comments = models.TextField(blank=True, null=True)  # Поле для комментариев
+    file = models.FileField(upload_to='articles/files/', blank=True, null=True)  # Поле для загрузки файла
+    start = models.DateField("Начало: ", null=True, blank=True)
+    deadline = models.DateField("Конец: ", null=True, blank=True)  # Поле для даты окончания
+    points = models.PositiveIntegerField(null=True, blank=True)  # Поле для количества баллов
+    year = models.PositiveIntegerField(null=True, blank=True)  # Поле для года
+
+    def __str__(self):
+        return self.title
 
 # Агрегация данных для администратора
 class AdminReport(models.Model):

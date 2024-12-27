@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование статьи: {{ article.title }}{% endblock %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/edit.css' %}">
+
+<h2>Редактирование статьи: {{ article.title }}</h2>
+
+<form method="post" enctype="multipart/form-data" class="edit-article-form">
+    {% csrf_token %}
+    <label for="title">Название статьи:</label>
+    <input type="text" name="title" value="{{ article.title }}" required>
+
+    <label for="coauthors">Выберите соавторов:</label>
+    <select name="coauthors" multiple>
+        {% for teacher in teachers %}
+            <option value="{{ teacher.id }}" {% if teacher in article.coauthors.all %}selected{% endif %}>
+                {{ teacher.get_full_name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <label for="comments">Комментарии:</label>
+    <textarea name="comments" rows="4" cols="50">{{ article.comments }}</textarea>
+
+    <label for="file">Загрузите новый файл (текущий файл:
+        {% if article.file %}
+            <a href="{{ article.file.url }}" class="unique-btn">Скачать</a>
+        {% else %}
+            отсутствует
+        {% endif %}
+    ):</label>
+    <input type="file" name="file">
+
+    <label for="deadline">Срок окончания:</label>
+    <input type="date" name="deadline" value="{{ article.deadline|date:'Y-m-d' }}">
+
+    <div class="form-buttons">
+        <button type="submit" class="unique-btn">Сохранить изменения</button>
+        <form method="post" action="{% url 'delete_article' article.id %}" class="unique-btn">
+            {% csrf_token %}
+            <button type="submit" class="delete-btn" onclick="return confirm('Вы уверены, что хотите удалить эту статью?');">Удалить статью</button>
+        </form>
+    </div>
+
+<a href="{% url 'indicator_articles' article.indicator.id %}"> Отмена</a>
+
+</form>
+
+{% endblock %}
