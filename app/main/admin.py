@@ -10,6 +10,7 @@ from import_export.widgets import ForeignKeyWidget
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id','username', 'first_name', 'last_name', 'role')  # Поля для отображения в списке
+    list_display_links = ('id', 'username', )
     search_fields = ('username', 'email')  # Поля для поиска
     list_filter = ('role',)  # Фильтрация по роли
 
